@@ -1,4 +1,4 @@
-MAPA DE LA ORGA
+MAPA DEL PLENO
 Cómo subirla a internet para que se pueda instalar en cualquier teléfono
 
 Qué hay en esta carpeta
@@ -10,14 +10,14 @@ Qué hay en esta carpeta
 Subirla a GitHub Pages (gratis, una sola vez)
   1. Creá una cuenta en https://github.com si no tenés.
   2. Arriba a la derecha, «+» → «New repository».
-     Nombre: pleno-serbio. Dejalo en «Public». Tocá «Create repository».
+     Nombre: mapa-del-pleno. Dejalo en «Public». Tocá «Create repository».
   3. En la página del repositorio nuevo, tocá «uploading an existing file».
   4. Arrastrá los seis archivos de esta carpeta (los archivos, sin la carpeta).
      Abajo tocá «Commit changes».
   5. Andá a «Settings» → «Pages». En «Source» elegí «Deploy from a branch»,
      en «Branch» elegí «main» y «/ (root)». Tocá «Save».
   6. En uno o dos minutos la app queda en:
-     https://TU-USUARIO.github.io/pleno-serbio/
+     https://TU-USUARIO.github.io/mapa-del-pleno/
      Ese es el link que se pasa por WhatsApp.
 
 Probarla antes de repartirla
@@ -25,14 +25,15 @@ Probarla antes de repartirla
   2. Instalala: en iPhone, Safari → Compartir → «Agregar a pantalla de inicio».
      En Android, Chrome → menú de tres puntos → «Instalar app».
   3. Poné el teléfono en modo avión y abrila desde el ícono. Tiene que abrir.
-  4. Tocá un sistema del diagrama y abrí la evidencia de una práctica. Tiene que verse la cita.
+  4. Hacé un mapa de prueba, cerrala y volvé a abrirla. El mapa tiene que seguir ahí.
 
 Actualizarla
   1. Subí el index.html nuevo al repositorio (mismo paso 3 y 4).
   2. Abrí sw.js en el repositorio, tocá el lápiz y cambiá el número de VERSION
-     (por ejemplo, de "pleno-serbio-1" a "pleno-serbio-2"). Guardá con «Commit changes».
+     (por ejemplo, de "mapa-pleno-1" a "mapa-pleno-2"). Guardá con «Commit changes».
   3. Los teléfonos toman la versión nueva la próxima vez que abran la app con conexión.
 
 Sobre los datos
-  La página no guarda nada de quien la usa. Las citas vienen de la codificación
-  piloto del corpus sobre el movimiento estudiantil serbio y están dentro de index.html.
+  El repositorio público deja ver el código de la app. Los mapas que hace cada
+  asamblea quedan solo en su teléfono y nunca llegan a GitHub ni a ningún otro lado.
+  Si alguien borra los datos del navegador o desinstala la app, sus mapas se pierden.

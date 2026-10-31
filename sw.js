@@ -1,6 +1,6 @@
 // Cambiá este número cada vez que subas un index.html nuevo,
 // así los teléfonos que ya la tienen instalada toman la actualización.
-var VERSION = "pleno-serbio-1";
+var VERSION = "mapa-pleno-1";
 var ARCHIVOS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {

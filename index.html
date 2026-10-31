@@ -4,219 +4,481 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#b5121b">
+<meta name="theme-color" content="#1d6670">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Pleno en Serbia">
-<title>Pleno en Serbia</title>
+<meta name="apple-mobile-web-app-title" content="Mapa del Pleno">
+<title>Mapa del Pleno</title>
 <style>
-/* Layout: lámina de referencia; diagrama VSM clicable arriba, panel de prácticas debajo, evidencia desplegable con la cita original. */
+/* Layout: una columna tipo libro de actas de asamblea; de día hoja rayada, de noche pizarrón. Sin fuentes externas para que funcione sin conexión. */
 :root{
-  --fondo:#f6f5f2; --hoja:#ffffff; --tinta:#1c1a1d; --suave:#625c63; --linea:#d9d4d6;
-  --rojo:#b5121b; --rojo-bg:#f8e3e3; --nodo:#ffffff; --nodo-sel:#1c1a1d; --nodo-sel-t:#ffffff;
-  --riesgo:#a35d00; --riesgo-bg:#fbefd9; --cita:#3b2f6b; --cita-bg:#efedf7;
-  --f-titulo:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --papel:#f9fbfb; --renglon:#d9e7e8; --margen:#2b7a83;
+  --tinta:#18272a; --tinta-suave:#55696d; --acento:#1d6670;
+  --firme:#2f8a57; --fragil:#c98a12; --falta:#c4453b;
+  --firme-bg:#e3f2ea; --fragil-bg:#fbf0d8; --falta-bg:#f9e1de;
+  --tarjeta:#ffffff; --borde:#cadcde; --cita:#3b2f6b; --cita-bg:#efedf7; --barra:#1d6670; --barra-bg:#ddecee;
+  --f-titulo:"Arial Rounded MT Bold","Trebuchet MS","Segoe UI",system-ui,sans-serif;
   --f-cuerpo:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --fondo:#18161a; --hoja:#221f24; --tinta:#efebee; --suave:#aaa1a8; --linea:#3a353c;
-  --rojo:#ff6b6b; --rojo-bg:#3a2224; --nodo:#221f24; --nodo-sel:#efebee; --nodo-sel-t:#18161a;
-  --riesgo:#f2b35b; --riesgo-bg:#3a2e1c; --cita:#c9c0ff; --cita-bg:#2a2638; color-scheme:dark }}
+  --papel:#172022; --renglon:#22302f; --margen:#2f6f76;
+  --tinta:#e9f2f2; --tinta-suave:#a3b8ba; --acento:#7fd0d9;
+  --firme:#6fcf97; --fragil:#f2c15b; --falta:#ff8a7e;
+  --firme-bg:#24382d; --fragil-bg:#3b3422; --falta-bg:#402a27;
+  --tarjeta:#1f2b2d; --borde:#34474a; --cita:#c9c0ff; --cita-bg:#2a2638; --barra:#7fd0d9; --barra-bg:#263a3d; color-scheme:dark }}
 :root[data-theme="dark"]{
-  --fondo:#18161a; --hoja:#221f24; --tinta:#efebee; --suave:#aaa1a8; --linea:#3a353c;
-  --rojo:#ff6b6b; --rojo-bg:#3a2224; --nodo:#221f24; --nodo-sel:#efebee; --nodo-sel-t:#18161a;
-  --riesgo:#f2b35b; --riesgo-bg:#3a2e1c; --cita:#c9c0ff; --cita-bg:#2a2638; color-scheme:dark }
+  --papel:#172022; --renglon:#22302f; --margen:#2f6f76;
+  --tinta:#e9f2f2; --tinta-suave:#a3b8ba; --acento:#7fd0d9;
+  --firme:#6fcf97; --fragil:#f2c15b; --falta:#ff8a7e;
+  --firme-bg:#24382d; --fragil-bg:#3b3422; --falta-bg:#402a27;
+  --tarjeta:#1f2b2d; --borde:#34474a; --cita:#c9c0ff; --cita-bg:#2a2638; --barra:#7fd0d9; --barra-bg:#263a3d; color-scheme:dark }
 *{box-sizing:border-box}
-body{background:var(--fondo);color:var(--tinta);font-family:var(--f-cuerpo);font-size:16px;line-height:1.55;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
-.envase{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
-h1,h2,h3{font-family:var(--f-titulo);text-wrap:balance;margin:0;line-height:1.2;font-weight:600}
-h1{font-size:clamp(1.9rem,4vw,2.6rem)}
-h2{font-size:1.45rem}
-h3{font-size:1.08rem}
+body{background:var(--papel);color:var(--tinta);font-family:var(--f-cuerpo);font-size:16px;line-height:1.5;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--renglon) 31px,var(--renglon) 32px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 48px}
+.hoja{max-width:640px;margin:0 auto;position:relative;padding-left:22px}
+.hoja::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--margen);opacity:.7}
+h1,h2,h3{font-family:var(--f-titulo);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:2rem;color:var(--acento)}
+h2{font-size:1.4rem}
+h3{font-size:1.05rem}
 p{margin:0}
-.etq{font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--suave)}
-.chico{font-size:.875rem;color:var(--suave)}
-.cab{display:flex;flex-direction:column;gap:10px;max-width:68ch}
-.mano{display:inline-block;width:10px;height:10px;background:var(--rojo);border-radius:2px;margin-right:6px;vertical-align:middle}
-.grilla{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:28px;align-items:start}
-@media (max-width:820px){.grilla{grid-template-columns:1fr}}
-.lamina{background:var(--hoja);border:1px solid var(--linea);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:12px}
-@media (max-width:820px){.lamina{position:static}}
-.lamina svg{width:100%;height:auto;display:block}
-.nodo{cursor:pointer}
-.nodo rect{fill:var(--nodo);stroke:var(--tinta);stroke-width:1.5}
-.nodo text{fill:var(--tinta);font-family:var(--f-cuerpo)}
-.nodo .n-cod{font-weight:700;font-size:12px}
-.nodo .n-nom{font-size:13px}
-.nodo .n-cnt{font-size:11px;fill:var(--suave)}
-.nodo.sel rect{fill:var(--nodo-sel);stroke:var(--nodo-sel)}
-.nodo.sel text{fill:var(--nodo-sel-t)}
-.nodo.sel text.marca-t{fill:var(--riesgo)}
-.nodo:focus-visible rect{stroke:var(--rojo);stroke-width:3}
-.nodo:focus{outline:none}
-.marca{fill:var(--riesgo-bg);stroke:var(--riesgo);stroke-width:1.5}
-.marca-t{fill:var(--riesgo);font-size:11px;font-weight:700}
-.marcas-off .marca,.marcas-off .marca-t{display:none}
-.flecha{stroke:var(--suave);stroke-width:1.2;fill:none}
-.fondo-afuera{fill:none;stroke:var(--suave);stroke-dasharray:4 4}
-.lbl-afuera{fill:var(--suave);font-size:11px}
-.fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.tog{border:1.5px solid var(--linea);background:var(--hoja);color:var(--tinta);border-radius:999px;padding:6px 14px;font:inherit;font-size:.875rem;cursor:pointer}
-.tog[aria-pressed="true"]{border-color:var(--riesgo);background:var(--riesgo-bg);color:var(--riesgo);font-weight:700}
-.panel{display:flex;flex-direction:column;gap:18px;min-width:0}
-.panel-cab{display:flex;flex-direction:column;gap:6px}
-.lista{display:flex;flex-direction:column;gap:10px}
-.item{background:var(--hoja);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
-.item.riesgo{border-left:4px solid var(--riesgo)}
-.item.practica{border-left:4px solid var(--rojo)}
-.item h3{font-family:var(--f-cuerpo);font-size:1rem;font-weight:700}
-.tipo{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.tipo.p{color:var(--rojo)} .tipo.r{color:var(--riesgo)}
-details.evid summary{cursor:pointer;font-size:.85rem;color:var(--suave);font-weight:600}
-details.evid summary:focus-visible{outline:2px solid var(--rojo);outline-offset:2px}
-.pasajes{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-.pasaje{display:flex;flex-direction:column;gap:3px;font-size:.9rem}
-.pasaje q{quotes:"«" "»";background:var(--cita-bg);color:var(--cita);padding:2px 6px;border-radius:4px;font-style:italic;align-self:flex-start;max-width:100%;overflow-wrap:anywhere}
-.pasaje .ref{font-size:.78rem;color:var(--suave);font-variant-numeric:tabular-nums}
-.secc{display:flex;flex-direction:column;gap:14px}
-.lecciones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
-.lec{background:var(--hoja);border:1px solid var(--linea);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
-.lec .dest{font-size:.8rem;color:var(--suave)}
-.tension{background:var(--rojo-bg);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
-.corpus{font-size:.85rem;color:var(--suave);display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--linea);padding-top:16px}
-.corpus ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.pila{display:flex;flex-direction:column;gap:16px}
+.chico{font-size:.875rem;color:var(--tinta-suave)}
+.etq{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--tinta-suave)}
+.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;cursor:pointer}
+.btn{border:2px solid var(--acento);background:var(--acento);color:var(--papel);border-radius:999px;padding:10px 20px;font-weight:700}
+.btn.sec{background:transparent;color:var(--acento)}
+.btn.peligro{border-color:var(--falta);background:transparent;color:var(--falta)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--fragil);outline-offset:2px}
+.fila{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.entre{justify-content:space-between}
+input[type=text],input[type=number]{font:inherit;width:100%;padding:10px 12px;border:2px solid var(--borde);border-radius:8px;background:var(--tarjeta);color:var(--tinta)}
+input[type=number]{max-width:120px;font-variant-numeric:tabular-nums}
+.num{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.num label{min-width:0}
+.ops{display:flex;flex-direction:column;gap:8px}
+.op{text-align:left;border:2px solid var(--borde);background:var(--tarjeta);color:var(--tinta);border-radius:10px;padding:12px 14px}
+.op[aria-pressed="true"]{border-color:var(--acento);box-shadow:inset 4px 0 0 var(--acento);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--borde);background:var(--tarjeta);color:var(--tinta);border-radius:999px;padding:6px 14px}
+.chip[aria-pressed="true"]{border-color:var(--acento);background:var(--acento);color:var(--papel)}
+.pasos{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.paso{border:2px solid var(--borde);background:var(--tarjeta);color:var(--tinta-suave);border-radius:6px;padding:4px 0;font-size:.75rem;font-weight:700;text-align:center;min-width:0;overflow:hidden}
+.paso.hecho{border-color:var(--acento);color:var(--acento)}
+.paso.ahora{background:var(--acento);border-color:var(--acento);color:var(--papel)}
+.estado{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700}
+.e-firme{background:var(--firme-bg);color:var(--firme)}
+.e-fragil{background:var(--fragil-bg);color:var(--fragil)}
+.e-falta{background:var(--falta-bg);color:var(--falta)}
+.hallazgo{border-left:4px solid var(--falta);padding:4px 0 4px 12px;display:flex;flex-direction:column;gap:4px}
+.hallazgo.fragil{border-left-color:var(--fragil)}
+.hallazgo .preg{font-style:italic;color:var(--acento)}
+.diagrama{overflow-x:auto}
+.diagrama svg{display:block;max-width:100%;height:auto;margin:0 auto}
+.lista{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.lista li{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.cmp{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 12px;font-size:.9rem;align-items:center}
+.embudo{display:flex;flex-direction:column;gap:8px}
+.eb-fila{display:grid;grid-template-columns:minmax(0,9.5em) 1fr 3em;gap:10px;align-items:center;font-size:.875rem}
+.eb-barra{background:var(--barra-bg);border-radius:4px;height:26px;position:relative;overflow:hidden}
+.eb-barra span{display:block;height:100%;background:var(--barra);border-radius:4px;min-width:2px}
+.eb-num{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.eb-pct{font-size:.75rem;color:var(--tinta-suave);font-variant-numeric:tabular-nums}
+.ejemplo{background:var(--fragil-bg);color:var(--fragil);border-radius:4px;padding:1px 6px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+details.guia-paso summary{cursor:pointer;font-weight:700;color:var(--acento)}
+details.guia-paso[open] summary{margin-bottom:4px}
+.serbia{font-size:.875rem;color:var(--cita);background:var(--cita-bg);border-radius:6px;padding:6px 10px}
+.e-serbia{background:var(--cita-bg);color:var(--cita)}
+.aviso{font-size:.875rem;color:var(--tinta-suave);border-top:1px dashed var(--borde);padding-top:12px}
+@media (prefers-reduced-motion:no-preference){.op,.chip,.btn{transition:border-color .15s,background .15s}}
 </style>
 
 </head>
 <body>
-<div class="envase">
-  <header class="cab">
-    <span class="etq"><span class="mano"></span>Movimiento estudiantil serbio · 2024–2026</span>
-    <h1>El pleno serbio, leído con el VSM</h1>
-    <p>Las prácticas organizativas del movimiento, ubicadas en las funciones del Modelo de Sistema Viable de Stafford Beer. Cada práctica y cada riesgo se apoya en pasajes de la codificación piloto, con la cita en su idioma original. Tocá un sistema del diagrama para ver lo suyo.</p>
-  </header>
-
-  <div class="grilla">
-    <div class="lamina" id="lamina">
-      <div id="diag"></div>
-      <div class="fila">
-        <button class="tog" id="t-riesgos" aria-pressed="true">Mostrar riesgos en el diagrama</button>
-      </div>
-      <p class="chico">El número en cada caja cuenta prácticas; la marca naranja, riesgos documentados en ese sistema. Los conteos reflejan dónde buscó la codificación, no cuánto pesa cada fenómeno en el movimiento.</p>
-    </div>
-    <section class="panel" id="panel" aria-live="polite"></section>
-  </div>
-
-  <section class="secc">
-    <div class="cab"><span class="etq">Lo transferible</span><h2>Seis lecciones para otras organizaciones</h2>
-    <p>Síntesis propia a partir del mapa. Cada lección indica dónde entra en las apps Mapa de la Orga, Mapa del Comité y Mapa del Pleno.</p></div>
-    <div class="lecciones" id="lecciones"></div>
-  </section>
-
-  <section class="tension">
-    <span class="etq">Tensión para los comités</span>
-    <h3>La distancia frente a los partidos</h3>
-    <p>El movimiento serbio protegió su autonomía excluyendo a militantes de partidos de la vocería y mirando a la oposición con sospecha. Dinić muestra que esa distancia pasó de táctica a norma de exclusión, como subproducto de la forma de decidir, y que terminó silenciando a quienes querían dialogar. Los comités junto a Myriam Bregman plantean lo contrario: una fusión del partido con quienes llegan. Las dos formas tienen un riesgo simétrico. La serbia arriesga la cámara de eco y la dependencia de una lista electoral improvisada; la de los comités arriesga que la orientación llegue resuelta y que los independientes queden mirando. La prueba para ambas es la misma: si el disenso sobre la relación con los partidos puede decirse en el pleno sin que quien lo dice termine yéndose.</p>
-  </section>
-
-  <footer class="corpus" id="corpus"></footer>
-</div>
+<div class="hoja" id="app"></div>
 
 <script>
 (function(){
 "use strict";
-var DATA={"p": [{"s": "s1", "t": "Bloqueo de facultades, con un pleno por facultad", "d": "Cada facultad bloqueada decide en su propio pleno por mayoría, y las decisiones pasan al pleno universitario. El primer pleno se convocó dos días después de una agresión durante un homenaje.", "refs": [20, 45]}, {"s": "s1", "t": "Silencio diario a la hora del derrumbe", "d": "La acción «Zastani, Srbijo!» repite cada día, a las 11:52, un silencio que se vuelve la columna del repertorio.", "refs": [12, 10, 7]}, {"s": "s1", "t": "Caminatas entre ciudades", "d": "Marchas de varios días entre ciudades universitarias, pasando por pueblos chicos; se citan como argumento para repetir la táctica.", "refs": [101, 102, 106]}, {"s": "s1", "t": "Protesta extendida en casi todo el territorio", "d": "Más de 10.700 protestas entre febrero y septiembre de 2025, en casi todos los municipios.", "refs": [93]}, {"s": "s1", "t": "Nodos que replican el ritual", "d": "Profesiones y vecindarios repiten el silencio frente a sus lugares de trabajo, sin centro único de decisión.", "refs": [99, 100]}, {"s": "s2", "t": "Orden del día fijo", "d": "Cada pleno sigue el mismo orden: orden del día, acta anterior, continuidad del bloqueo, elección de moderadores, conmemoración, informes de grupos.", "refs": [30]}, {"s": "s2", "t": "Tiempos por punto y por orador", "d": "Entre 15 y 30 minutos por punto y entre 1 y 3 minutos por orador; un modelo posterior limita a cinco intervenciones por punto.", "refs": [21, 31]}, {"s": "s2", "t": "Señas para acuerdo y desacuerdo", "d": "Un sistema de señas permite mostrar acuerdo o desacuerdo sin interrumpir a quien habla.", "refs": [22, 152]}, {"s": "s2", "t": "Roles separados y rotativos", "d": "Moderación rotativa, un segundo moderador para tiempos y turnos, secretaría de actas; coordinadores que cambian cada dos semanas.", "refs": [27, 157, 147, 17]}, {"s": "s2", "t": "Tres tipos de palabra", "d": "Exposición, réplica y objeción técnica: esta última corrige información o procedimiento sin abrir el debate de fondo.", "refs": [150, 158]}, {"s": "s2", "t": "Pleno universitario como nodo de difusión", "d": "El pleno universitario y los canales entre delegados hacen circular las prácticas que funcionan entre facultades.", "refs": [75]}, {"s": "s2", "t": "Ritmo ajustado al desgaste", "d": "Los plenos diarios se abandonaron por agotadores; cada colectivo ajustó su ritmo.", "refs": [122]}, {"s": "s3", "t": "Grupos de trabajo con informe obligatorio", "d": "Ciclo decisión, ejecución e informe al pleno.", "refs": [25]}, {"s": "s3", "t": "Servicio de orden estudiantil", "d": "Grupos de seguridad propios manejan tránsito, rutas de ambulancia y orden en las marchas.", "refs": [54]}, {"s": "s3", "t": "Defensa en capas contra infiltración", "d": "Detección, votación, protección procedimental, sanciones y lista de exclusión.", "refs": [49, 50]}, {"s": "s3", "t": "Red ciudadana de apoyo", "d": "Abogados, salud y psicología pro bono; vecinos, motociclistas y veteranos en seguridad y logística, en redes de confianza sin jerarquía.", "refs": [64, 65, 66]}, {"s": "s3e", "t": "Actas como memoria colectiva", "d": "El acta da transparencia y memoria del proceso; se aprueba al inicio del pleno siguiente.", "refs": [28, 30]}, {"s": "s3e", "t": "Toda decisión es revisable", "d": "Las decisiones pueden cambiarse ante información nueva, y eso se presenta como fuente de legitimidad.", "refs": [15, 19]}, {"s": "s3e", "t": "Voto de desconfianza", "d": "Mecanismo para sancionar a quien intenta imponerse.", "refs": [29, 32]}, {"s": "s3e", "t": "Evaluación después de cada acción grande", "d": "Qué se hizo bien y qué se hizo mal, en colectivo.", "refs": [78]}, {"s": "s3e", "t": "Si falta información, no se vota", "d": "Cuando varias personas dicen que falta información, la votación se posterga.", "refs": [160]}, {"s": "s3e", "t": "El pleno se deja estudiar", "d": "Un pleno aprobó ser observado por estudiantes formados en el método de Bales, que registró caída de motivación y aparición de facciones.", "refs": [82, 80, 138, 85]}, {"s": "s4", "t": "Aprender de experiencias anteriores", "d": "El manual de bloqueos de Zagreb (2009) y los bloqueos de Belgrado sirvieron de modelo inicial, luego reemplazado por reglamentos propios.", "refs": [72, 76, 77]}, {"s": "s4", "t": "Carta al pueblo: asambleas vecinales", "d": "El llamado a organizarse en zborovi (asambleas vecinales previstas por la ley), con su límite: son consultivas.", "refs": [88, 89, 90]}, {"s": "s4", "t": "Del pleno a la lista electoral", "d": "La lista estudiantil como condición para el regreso de la política; el futuro del movimiento queda atado a la convocatoria a elecciones.", "refs": [87, 96]}, {"s": "s4", "t": "Disputa de la escena pública", "d": "Los medios oficialistas los llaman bloqueadores y «revolución de color»; el régimen produce su propia escena (Ćaciland).", "refs": [35, 36, 41]}, {"s": "s5", "t": "El duelo en el centro", "d": "El silencio por las víctimas organiza el movimiento y protege a los participantes; los minutos crecen con cada muerte.", "refs": [9, 11, 13, 69]}, {"s": "s5", "t": "Nadie por encima de la comunidad", "d": "Comunicados contra el culto a la personalidad; testimonios que rechazan destacar el propio nombre.", "refs": [33, 67, 68]}, {"s": "s5", "t": "Anonimato y voceros de una sola vez", "d": "Cada estudiante puede hablar en público una sola vez; no se filma el pleno; la lección de los noventa: los representantes fueron cooptados.", "refs": [39, 40, 42, 34]}, {"s": "s5", "t": "Decisión colectiva, sin representantes", "d": "El gobierno pidió representantes para negociar y el movimiento se negó.", "refs": [26, 24]}, {"s": "s5", "t": "No violencia como regla", "d": "Ataques verbales prohibidos dentro del pleno; contención sostenida frente a provocaciones afuera.", "refs": [47, 53, 55]}, {"s": "s5", "t": "Legitimidad antes que eficiencia", "d": "La ineficiencia se acepta como precio de que el proceso sea de todos.", "refs": [105, 104, 103]}], "r": [{"s": "s5", "t": "Oligarquización", "d": "Un núcleo duro, un círculo chico de moderadores o una minoría organizada termina definiendo los temas.", "refs": [109, 110, 123, 126, 127, 137]}, {"s": "s2", "t": "La reunión que vacía el pleno", "d": "Coordinaciones nocturnas que deciden y después comunican.", "refs": [114, 124]}, {"s": "s3", "t": "Fatiga sin relevo", "d": "Euforia inicial, después agotamiento; quedan los más comprometidos y se pierde el factor de corrección.", "refs": [121, 113, 119, 132, 134, 140]}, {"s": "s2", "t": "Sesgo de voz", "d": "La deliberación solo oral y el voto a mano alzada favorecen a quien habla con soltura y abren espacio a la presión social.", "refs": [111, 146, 153, 161]}, {"s": "s3e", "t": "Sospecha que silencia", "d": "La acusación de sabotaje se usa contra quien propone otra estrategia; los disidentes callan o se van.", "refs": [125, 151, 148, 145, 46]}, {"s": "s4", "t": "Cámara de eco frente a los partidos", "d": "La distancia táctica frente a la oposición se vuelve norma de exclusión, como subproducto de la forma de decidir.", "refs": [115, 117, 118, 120, 130]}, {"s": "s3", "t": "Responsabilidad de todos, de nadie", "d": "En decisiones que requieren participación masiva aparece el efecto espectador.", "refs": [129]}, {"s": "s5", "t": "De plenos abiertos a negociaciones cerradas", "d": "La etapa electoral desplaza la decisión hacia negociaciones cerradas sobre candidaturas, y la coordinación horizontal se vuelve una carga cuando la movilización se prolonga.", "refs": [133, 141]}, {"s": "s1", "t": "Costos que expulsan", "d": "Pagar alojamiento sin poder trabajar saca gente del bloqueo y cambia la composición del pleno; el servicio de orden concentra la exposición física.", "refs": [61, 62, 63]}], "pas": {"7": {"texto": "Jakovljević y Pajović", "pag": "201", "cod": "C1", "valor": "duelo/conmemoración", "cita": "the 16 minutes of silence", "nota": "El acto central de las concentraciones es el silencio, no el discurso de un líder."}, "9": {"texto": "Pešić, Birešev y Marković", "pag": "211", "cod": "C1", "valor": "duelo/conmemoración", "cita": "strategija političke borbe koja ima cilj da zaštiti učesnike od represije", "nota": "El silencio como duelo, como resistencia y como estrategia para proteger a los participantes de la represión."}, "10": {"texto": "Pešić, Birešev y Marković", "pag": "213", "cod": "C1", "valor": "duelo/conmemoración", "cita": "tihi protesti čine okosnicu repertoara", "nota": "Las protestas silenciosas son la columna del repertorio y distinguen esta movilización de las anteriores."}, "11": {"texto": "Pešić, Birešev y Marković", "pag": "220", "cod": "C1", "valor": "duelo/conmemoración", "cita": "nije bio čin političkog nasilja već tragični događaj", "nota": "El detonante fue una tragedia por negligencia, no un acto de violencia política."}, "12": {"texto": "Pešić, Birešev y Marković", "pag": "220", "cod": "C1", "valor": "duelo/conmemoración", "cita": "organizovani svakodnevno u 11 časova i 52 minuta", "nota": "Acción \"Zastani, Srbijo!\": silencio diario a la hora del derrumbe; los hitos del movimiento (22/11, 22/12, 15/3) se vinculan a protestas silenciosas."}, "13": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "163", "cod": "C1", "valor": "duelo/conmemoración", "cita": "tišina se može razumeti kao jedan od centralnih oblika", "nota": "El silencio conmemorativo mantiene visible la tragedia y moviliza a quienes no participan en formas más radicales."}, "15": {"texto": "Birešev, Marković y Pešić", "pag": "147", "cod": "C2", "valor": "revisión de decisiones", "cita": "ta promenljivost odluka", "nota": "Las decisiones pueden cambiarse ante nueva información."}, "17": {"texto": "Birešev, Marković y Pešić", "pag": "150", "cod": "C2", "valor": "rotación de funciones", "cita": "koordinator se menja na dve nedelje", "nota": "Grupos abiertos, coordinador rotativo cada dos semanas, todo registrado y legible."}, "19": {"texto": "ICNC", "pag": "7", "cod": "C2", "valor": "revisión de decisiones", "cita": "Every decision is changeable.", "nota": "Testimonio de estudiante: la revisabilidad de toda decisión se presenta como fuente de legitimidad."}, "20": {"texto": "ICNC", "pag": "10", "cod": "C2", "valor": "votación", "cita": "decisions at the plenums were made exclusively by a majority", "nota": "Plenos de facultad deciden por mayoría; las decisiones pasan al pleno universitario, también por mayoría."}, "21": {"texto": "ICNC", "pag": "27", "cod": "C2", "valor": "reglas de palabra", "cita": "presentation/question; replica; technical objection", "nota": "Tiempos limitados por punto (15–30 min) y por orador (1–3 min); protocolo inspirado en procedimientos parlamentarios."}, "22": {"texto": "ICNC", "pag": "28", "cod": "C2", "valor": "reglas de palabra", "cita": "jazz hands", "nota": "Sistema de señas no verbales para acuerdo y desacuerdo sin interrumpir."}, "24": {"texto": "ICNC", "pag": "30", "cod": "C2", "valor": "revocación/voto de desconfianza", "cita": "suspicion towards anyone who tries to impose themselves as a leader", "nota": "Desconfianza hacia liderazgos incorporada desde el inicio."}, "25": {"texto": "ICNC", "pag": "33", "cod": "C2", "valor": "actas/memoria", "cita": "working group reports to the plenum", "nota": "Ciclo decisión → ejecución → informe obligatorio al pleno."}, "26": {"texto": "Jakovljević y Pajović", "pag": "204", "cod": "C2", "valor": "revocación/voto de desconfianza", "cita": "invited students to elect representatives for negotiations", "nota": "El gobierno pidió representantes para negociar; los estudiantes rechazaron por el principio de decisión colectiva."}, "27": {"texto": "Manić y Marković", "pag": "97", "cod": "C2", "valor": "rotación de funciones", "cita": "Moderatori plenuma, birani po rotirajućem principu", "nota": "Moderadores rotativos, moderador adicional para tiempos, secretario de actas."}, "28": {"texto": "Manić y Marković", "pag": "97", "cod": "C2", "valor": "actas/memoria", "cita": "memorije kolektivnog procesa", "nota": "El acta establece transparencia y memoria del proceso colectivo."}, "29": {"texto": "Manić y Marković", "pag": "97", "cod": "C2", "valor": "revocación/voto de desconfianza", "cita": "izglasavanjem nepoverenja sankcioniše", "nota": "Voto de desconfianza como mecanismo clave contra liderazgos."}, "30": {"texto": "Manić y Marković", "pag": "98", "cod": "C2", "valor": "reglas de palabra", "cita": "usvajanjem dnevnog reda", "nota": "Orden fijo: orden del día, aprobación del acta anterior, votación sobre continuidad del bloqueo, elección de moderadores, conmemoración, informes de grupos."}, "31": {"texto": "Manić y Marković", "pag": "100", "cod": "C2", "valor": "reglas de palabra", "cita": "ograničena na 5 po tački", "nota": "Nuevo modelo de moderación limita intervenciones a cinco por punto."}, "32": {"texto": "Manić y Marković", "pag": "102", "cod": "C2", "valor": "revocación/voto de desconfianza", "cita": "izglasavanja nepoverenja članu plenuma", "nota": "Un voto de desconfianza observado."}, "33": {"texto": "Birešev, Marković y Pešić", "pag": "139", "cod": "C3", "valor": "anonimato/rotación de voceros", "cita": "Nemamo pojedince koji stoje iznad zajednice", "nota": "Comunicado de los estudiantes (31/12/2024) contra el culto a la personalidad y la exaltación de individuos."}, "34": {"texto": "Dinić", "pag": "140-141", "cod": "C3", "valor": "anonimato/rotación de voceros", "cita": "ne mogu da izlaze u medije", "nota": "Plenos de Derecho (Belgrado, Novi Sad) prohíben a militantes de partidos y ONG hablar en nombre del pleno, ir a medios o dar discursos en protestas."}, "35": {"texto": "ICNC", "pag": "36", "cod": "C3", "valor": "distancia frente a medios", "cita": "blockaders", "nota": "Medios oficialistas etiquetan el movimiento como traidor, financiado desde afuera, \"revolución de color\"."}, "36": {"texto": "Ivković, Petrović Trifunović y Prodanović", "pag": "pdf10", "cod": "C3", "valor": "distancia frente a medios", "cita": "infiltrated by enemy forces", "nota": "La prensa de 1988 deslegitima protestas de grupos externos como manipuladas y organizadas por enemigos: mismo repertorio que el actual \"revolución de color\"."}, "39": {"texto": "Jakovljević y Pajović", "pag": "197", "cod": "C3", "valor": "anonimato/rotación de voceros", "cita": "prevent the emergence of leaders", "nota": "El anonimato evita líderes (lección de los años noventa: representantes cooptados) y protege la seguridad."}, "40": {"texto": "Jakovljević y Pajović", "pag": "197", "cod": "C3", "valor": "anonimato/rotación de voceros", "cita": "each student may do so only once", "nota": "Cada estudiante puede hablar en público una sola vez."}, "41": {"texto": "Jakovljević y Pajović", "pag": "205", "cod": "C3", "valor": "distancia frente a medios", "cita": "Ćaciland", "nota": "Campamento de supuestos estudiantes pro-régimen con protección policial y cobertura estatal: producción oficialista de escena."}, "42": {"texto": "Manić y Marković", "pag": "97", "cod": "C3", "valor": "prohibición de imagen", "cita": "Na plenumu je zabranjeno snimanje i fotografisanje", "nota": "Prohibición de grabar y fotografiar en el pleno."}, "45": {"texto": "Birešev, Marković y Pešić", "pag": "138", "cod": "C4", "valor": "violencia sufrida", "cita": "fizički napadnute na ulici", "nota": "El primer pleno (Artes Dramáticas, 25/11/2024) se convocó dos días después de una agresión física durante un homenaje a las víctimas."}, "46": {"texto": "Dinić", "pag": "139", "cod": "C4", "valor": "expulsión/disociación de provocadores", "cita": "„paranoična kognicija” u značajnoj meri proširila i na insajdere", "nota": "La sospecha se extiende a estudiantes militantes de partidos, vistos como agentes externos."}, "47": {"texto": "ICNC", "pag": "28", "cod": "C4", "valor": "no violencia como regla", "cita": "personal (verbal) attacks on dissenters are strictly forbidden", "nota": "Insultos y ataques verbales prohibidos y sancionados dentro del pleno."}, "49": {"texto": "ICNC", "pag": "35", "cod": "C4", "valor": "expulsión/disociación de provocadores", "cita": "a so-called \"blacklist\"", "nota": "Sistema de defensa en capas: detección, votación, protección procedimental, sanciones y lista de exclusión."}, "50": {"texto": "ICNC", "pag": "35", "cod": "C4", "valor": "expulsión/disociación de provocadores", "cita": "proven to be a member of the Serbian Progressive Party", "nota": "Caso de una estudiante del partido de gobierno excluida por filtrar información."}, "53": {"texto": "Jakovljević y Pajović", "pag": "198", "cod": "C4", "valor": "no violencia como regla", "cita": "Students have consistently responded with nonviolence", "nota": "Mujeres en roles prominentes, blanco de policía y matones del partido; respuesta no violenta sostenida."}, "54": {"texto": "Jakovljević y Pajović", "pag": "200", "cod": "C4", "valor": "servicio de orden", "cita": "student security working groups took over", "nota": "Grupos de seguridad estudiantiles asumen control de tránsito, rutas de ambulancia y orden en las marchas; chalecos amarillos reservados al servicio de orden."}, "55": {"texto": "Jakovljević y Pajović", "pag": "200", "cod": "C4", "valor": "no violencia como regla", "cita": "remarkable restraint in the face of provocations", "nota": "Contención frente a provocaciones de matones y policías de civil."}, "61": {"texto": "Dinić", "pag": "142", "cod": "C5", "valor": "costo sobre participantes", "cita": "nisu mogli da plaćaju stanove", "nota": "El costo económico del bloqueo expulsa a estudiantes y cambia la composición del pleno."}, "62": {"texto": "ICNC", "pag": "17", "cod": "C5", "valor": "costo sobre participantes", "cita": "financial burden of paying for accommodation", "nota": "Presión económica de alojamiento obliga a algunos a trabajar o volver a casa."}, "63": {"texto": "Pešić, Birešev y Marković", "pag": "222-223", "cod": "C5", "valor": "asimetría operador/expuesto", "cita": "upravo članovi obezbeđenja svakodnevno bili izloženi", "nota": "Sin protección policial, el servicio de orden concentró la exposición a ataques físicos, con lesiones y traumas."}, "64": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "158", "cod": "C5", "valor": "protección colectiva", "cita": "svakodnevnom radu na prikupljanju i raspodeli resursa", "nota": "El apoyo ciudadano se organizó en redes informales y no jerárquicas basadas en vínculos personales y confianza."}, "65": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "166", "cod": "C5", "valor": "protección colectiva", "cita": "pro bono usluge", "nota": "Abogados, personal de salud y psicólogos ofrecen servicios gratuitos; motociclistas, veteranos y vecinos asumen seguridad y logística."}, "66": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "170", "cod": "C5", "valor": "reparto de riesgo", "cita": "„jedan minimum” koji se mora učiniti čak i uz lični rizik", "nota": "El apoyo se describe como mínimo ético asumido con riesgo personal."}, "67": {"texto": "Birešev, Marković y Pešić", "pag": "139", "cod": "C6", "valor": "crítica o rechazo de la heroización", "cita": "Ovo nije ni mesto, ni vreme za isticanje pojedinaca", "nota": "Mismo comunicado: rechazo explícito a destacar individuos."}, "68": {"texto": "Birešev, Marković y Pešić", "pag": "145", "cod": "C6", "valor": "crítica o rechazo de la heroización", "cita": "nije mi važno sad nešto da se moje ime istakne", "nota": "Testimonio: importa contribuir al movimiento, no que se destaque el propio nombre."}, "69": {"texto": "Jakovljević y Pajović", "pag": "201", "cod": "C6", "valor": "víctimas sin martirio", "cita": "signifying lives being stopped in their tracks", "nota": "El silencio crece con cada víctima (14, 15, 16 minutos): conmemora muertes por negligencia, sin heroización."}, "72": {"texto": "Birešev, Marković y Pešić", "pag": "139", "cod": "C7", "valor": "aprendizaje entre plenos", "cita": "Blokadna kuharica (2009) ... poslužila je kao uzor", "nota": "Experiencias previas en Belgrado (2006, 2011, 2014) y el manual de Zagreb como modelo."}, "75": {"texto": "ICNC", "pag": "10", "cod": "C7", "valor": "aprendizaje entre plenos", "cita": "propagation of best practices across different faculties", "nota": "El pleno universitario y los canales informales entre delegados funcionan como nodo de difusión de prácticas."}, "76": {"texto": "ICNC", "pag": "18", "cod": "C7", "valor": "aprendizaje entre plenos", "cita": "Blokadna kuharica", "nota": "El manual de bloqueos de Zagreb (2009) sirvió de inspiración inicial y luego fue reemplazado por reglamentos propios."}, "77": {"texto": "ICNC", "pag": "19", "cod": "C7", "valor": "autoanálisis", "cita": "developed our own, um, rulebook for the plenum", "nota": "Saber organizativo adquirido por práctica, boca a boca y redacción posterior de reglamentos escritos."}, "78": {"texto": "ICNC", "pag": "33", "cod": "C7", "valor": "autoanálisis", "cita": "what was done well and what was done poorly", "nota": "Evaluación colectiva después de cada acción grande como mecanismo de control y aprendizaje."}, "80": {"texto": "Manić y Marković", "pag": "91", "cod": "C7", "valor": "uso de teoría o método", "cita": "Četvoro studenata istraživača je prethodno prošlo obuku", "nota": "Cuatro estudiantes participantes, formados con pautas basadas en Bales, observaron los plenos."}, "82": {"texto": "Manić y Marković", "pag": "97", "cod": "C7", "valor": "autoanálisis", "cita": "Plenum ... je dao saglasnost za realizaciju istraživanja", "nota": "El pleno aprobó formalmente ser investigado."}, "85": {"texto": "Manić y Marković", "pag": "105", "cod": "C7", "valor": "uso de teoría o método", "cita": "ograničene, ali ... heuristički plodan", "nota": "Conclusión: aplicabilidad limitada, valor heurístico, mejor para clima socioemocional que para tareas."}, "87": {"texto": "Bieber (entrevista, Burazer)", "pag": "pdf3", "cod": "C8", "valor": "transformación", "cita": "creating the conditions for the return of politics", "nota": "La lista estudiantil como condición para el regreso de la política, sin programa completo; gobierno previsto como breve."}, "88": {"texto": "Birešev, Marković y Pešić", "pag": "139", "cod": "C8", "valor": "transformación", "cita": "„Pismo narodu Srbije”", "nota": "Carta del 9/3/2025 invita a la sociedad a autoorganizarse en asambleas vecinales (zborovi) previstas por la ley: \"prefiguración abierta\"."}, "89": {"texto": "Birešev, Marković y Pešić", "pag": "151", "cod": "C8", "valor": "transformación", "cita": "zbor u Beogradu može da kaže da treba da se smeni ministar", "nota": "Límite legal: los zborovi son consultivos y no pueden destituir a un ministro."}, "90": {"texto": "Birešev, Marković y Pešić", "pag": "152", "cod": "C8", "valor": "transformación", "cita": "instrumenti korekcije, nadzora i transformacije", "nota": "La mayoría ve las asambleas como correctivo de las instituciones representativas, no como su reemplazo."}, "93": {"texto": "ICNC", "pag": "10", "cod": "C8", "valor": "movilización reproducible", "cita": "more than 10,700 protests", "nota": "Más de 10.700 protestas entre febrero y septiembre de 2025 en casi todos los municipios."}, "96": {"texto": "ICNC", "pag": "46", "cod": "C8", "valor": "transformación", "cita": "tied its future almost entirely to participation in the electoral process", "nota": "Paradoja: el movimiento nacido de la crítica partidaria quedó dependiente de la decisión del régimen de convocar elecciones (antes de la elección de octubre de 2026)."}, "99": {"texto": "Pešić, Birešev y Marković", "pag": "221", "cod": "C8", "valor": "movilización reproducible", "cita": "horizontalno strukturisanih nodusa otpora", "nota": "Profesiones y vecindarios replicaron el ritual ante sus lugares de trabajo: nodos horizontales que reproducen los núcleos de bloqueo."}, "100": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "175", "cod": "C8", "valor": "movilización reproducible", "cita": "bez jedinstvenog centra odlučivanja", "nota": "Redes horizontales y mediadores locales sostienen la coordinación sin centro único."}, "101": {"texto": "ICNC", "pag": "10", "cod": "C9", "valor": "marchas/caminatas", "cita": "multi-day actions of many students walking", "nota": "Caminatas de varios días entre ciudades universitarias y travesía en bicicleta hasta Estrasburgo."}, "102": {"texto": "ICNC", "pag": "34", "cod": "C9", "valor": "marchas/caminatas", "cita": "protest walks across Serbia between major cities", "nota": "Las acciones exitosas sostienen moral, cohesión y legitimidad pública."}, "103": {"texto": "ICNC", "pag": "39", "cod": "C9", "valor": "persistencia temporal", "cita": "slow, bureaucratic, exhausting, and often frustrating process", "nota": "La idealización de la democracia directa da paso a una comprensión realista."}, "104": {"texto": "ICNC", "pag": "40", "cod": "C9", "valor": "persistencia temporal", "cita": "affective labor", "nota": "El temor a fallarle al grupo motiva más que la comodidad personal; la escuela como segundo hogar."}, "105": {"texto": "ICNC", "pag": "48", "cod": "C9", "valor": "persistencia temporal", "cita": "legitimacy can act as a stronger cohesive force than efficiency", "nota": "La ineficiencia aceptada como precio por la propiedad del proceso."}, "106": {"texto": "Manić y Marković", "pag": "102-103", "cod": "C9", "valor": "marchas/caminatas", "cita": "šetnja do Novog Sada kroz mala mesta", "nota": "La caminata por pueblos pequeños se cita como argumento para repetir la táctica."}, "109": {"texto": "Birešev, Marković y Pešić", "pag": "145", "cod": "C10", "valor": "concentración informal de poder", "cita": "oligarhizacije odlučivanja u samoorganizovanim telima", "nota": "Riesgos reconocidos por los participantes: instrumentalización, camarillas, liderazgos, oligarquización."}, "110": {"texto": "Birešev, Marković y Pešić", "pag": "148", "cod": "C10", "valor": "concentración informal de poder", "cita": "ta jedna glasna organizovana manjina", "nota": "Testimonio: no existe oposición en el pleno porque una minoría organizada gana confianza y los disidentes dejan de asistir."}, "111": {"texto": "Birešev, Marković y Pešić", "pag": "149", "cod": "C10", "valor": "concentración informal de poder", "cita": "prednost imati oni koji su sigurniji u sebe", "nota": "La deliberación exclusivamente verbal favorece a los extrovertidos con experiencia de hablar en público."}, "113": {"texto": "Birešev, Marković y Pešić", "pag": "149", "cod": "C10", "valor": "fatiga/desgaste", "cita": "se stvarno svi zamaraju", "nota": "Grupos de trabajo cerrados por cansancio; la rotación decae con el tiempo."}, "114": {"texto": "Birešev, Marković y Pešić", "pag": "150", "cod": "C10", "valor": "concentración informal de poder", "cita": "Onda samo vi sastančite tokom noći i saopštite odluke", "nota": "Crítica a la reunión de coordinación que vacía el pleno."}, "115": {"texto": "Dinić", "pag": "128-129", "cod": "C10", "valor": "polarización/cámara de eco", "cita": "utvrđivanje predrasude prema opozicionim partijama", "nota": "Tesis: el pleno disolvió prejuicios étnicos e ideológicos y reforzó el prejuicio contra los partidos opositores."}, "117": {"texto": "Dinić", "pag": "135-136", "cod": "C10", "valor": "polarización/cámara de eco", "cita": "ispunjavaju", "nota": "Los plenos cumplen todas las condiciones de Sunstein para la polarización grupal: identidad común, solidaridad, grupo externo rival, cercanía física, reuniones frecuentes."}, "118": {"texto": "Dinić", "pag": "139", "cod": "C10", "valor": "polarización/cámara de eco", "cita": "„normu isključivanja koja je samoodrživa”", "nota": "La distancia frente a partidos pasó de táctica a norma de exclusión que moldea las creencias (Hardin)."}, "119": {"texto": "Dinić", "pag": "142-143", "cod": "C10", "valor": "fatiga/desgaste", "cita": "Ostala je grupa najposvećenijih", "nota": "Testimonio de un decano: cuando los estudiantes se fueron por razones económicas, quedaron los más comprometidos, sin factor de corrección."}, "120": {"texto": "Dinić", "pag": "146", "cod": "C10", "valor": "polarización/cámara de eco", "cita": "nusprodukt plenumskog načina odlučivanja", "nota": "Conclusión: el rechazo a la oposición es subproducto de la forma de decisión, no convicción ideológica; puede cambiarse sin traicionar los ideales."}, "121": {"texto": "ICNC", "pag": "17", "cod": "C10", "valor": "fatiga/desgaste", "cita": "initial euphoria to later phases of exhaustion", "nota": "Trayectoria de compromiso: euforia inicial, luego agotamiento y formación de un núcleo duro."}, "122": {"texto": "ICNC", "pag": "19", "cod": "C10", "valor": "fatiga/desgaste", "cita": "this tempo proved to be exhausting and unsustainable", "nota": "Plenos diarios abandonados; cada colectivo ajusta su ritmo."}, "123": {"texto": "ICNC", "pag": "19-20", "cod": "C10", "valor": "concentración informal de poder", "cita": "a small group of moderators or the \"hard core\" determined the topics", "nota": "La forma de armar el orden del día distingue plenos maduros (transparentes, desde abajo) de plenos cerrados."}, "124": {"texto": "ICNC", "pag": "23", "cod": "C10", "valor": "concentración informal de poder", "cita": "little groups there that make arrangements in advance", "nota": "Testimonio de abandono por desconfianza en la democracia directa."}, "125": {"texto": "ICNC", "pag": "27-28", "cod": "C10", "valor": "concentración informal de poder", "cita": "saboteurs or lobbyists", "nota": "La acusación de sabotaje se usa también para silenciar a opositores internos con estrategias distintas."}, "126": {"texto": "ICNC", "pag": "29", "cod": "C10", "valor": "concentración informal de poder", "cita": "a small, informal circle of more experienced students", "nota": "La función de moderador rota dentro de un círculo pequeño porque pocos aceptan el rol."}, "127": {"texto": "ICNC", "pag": "30", "cod": "C10", "valor": "concentración informal de poder", "cita": "their informal power is ubiquitous", "nota": "Poder informal basado en capital social, retórica y nivel de compromiso."}, "129": {"texto": "ICNC", "pag": "33", "cod": "C10", "valor": "fatiga/desgaste", "cita": "collective responsibility can in practice become no one's responsibility", "nota": "Efecto espectador en decisiones que requieren participación masiva."}, "130": {"texto": "ICNC", "pag": "34", "cod": "C10", "valor": "cooptación/partidos", "cita": "anti-political sentiment was, in fact, actively stoked by regime proxies", "nota": "Los autores sugieren que el rechazo a la política pudo ser alimentado por el régimen para aislar al movimiento."}, "132": {"texto": "ICNC", "pag": "45", "cod": "C10", "valor": "fatiga/desgaste", "cita": "largely withdrawn, exhausted", "nota": "El núcleo inicial se retiró por desgaste y conflictos internos."}, "133": {"texto": "ICNC", "pag": "46", "cod": "C10", "valor": "burocratización", "cita": "From open plenums to closed negotiations", "nota": "Paso de plenos abiertos a negociaciones cerradas sobre candidaturas."}, "134": {"texto": "ICNC", "pag": "48", "cod": "C10", "valor": "fatiga/desgaste", "cita": "vulnerability to burnout and the lack of transitional mechanisms", "nota": "Debilidad principal identificada por los autores."}, "137": {"texto": "Manić y Marković", "pag": "100", "cod": "C10", "valor": "concentración informal de poder", "cita": "Javljale su se većinski iste osobe kao i uvek", "nota": "Participación desigual; peso del capital social de moderadores."}, "138": {"texto": "Manić y Marković", "pag": "102", "cod": "C10", "valor": "fatiga/desgaste", "cita": "opadanja motivacije, rast umora i pojava frakcija", "nota": "Bales permitió registrar caída de motivación, cansancio y aparición de facciones."}, "140": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "173", "cod": "C10", "valor": "fatiga/desgaste", "cita": "opasnost od sagorevanja", "nota": "Riesgo de agotamiento y reparto desigual del trabajo dentro de las iniciativas."}, "141": {"texto": "Radovanović, Radovanović y Nikolić", "pag": "176", "cod": "C10", "valor": "burocratización", "cita": "potencijalni izvor organizacionog opterećenja", "nota": "La coordinación horizontal se vuelve carga cuando la movilización se prolonga."}, "145": {"texto": "Birešev, Marković y Pešić", "pag": "148", "cod": "C11", "valor": "protección o supresión del disenso", "cita": "Opozicija na plenumu čini mi se da ne postoji", "nota": "No hay oposición estructurada dentro del pleno; los disidentes se retiran."}, "146": {"texto": "Birešev, Marković y Pešić", "pag": "149", "cod": "C11", "valor": "sesgo de voz", "cita": "osim verbalno", "nota": "La deliberación exclusivamente oral favorece a los extrovertidos con experiencia de hablar en público."}, "147": {"texto": "Dinić", "pag": "131", "cod": "C11", "valor": "asignación de roles", "cita": "Plenum svaki put vode različita dva moderatora", "nota": "Modelo del manual de Zagreb: dos moderadores distintos, elegidos al final de cada pleno."}, "148": {"texto": "Dinić", "pag": "141", "cod": "C11", "valor": "protección o supresión del disenso", "cita": "sve ređe javno iznositi svoje stavove", "nota": "Bajo la norma de exclusión, quienes favorecen el diálogo con la oposición callan o abandonan el pleno."}, "150": {"texto": "ICNC", "pag": "27", "cod": "C11", "valor": "canales formales de disenso", "cita": "technical objection", "nota": "Tres tipos de toma de palabra; la objeción técnica permite corregir información o procedimiento sin abrir debate de fondo."}, "151": {"texto": "ICNC", "pag": "27-28", "cod": "C11", "valor": "protección o supresión del disenso", "cita": "saboteurs or lobbyists", "nota": "La etiqueta de sabotaje anula el derecho formal a hablar: supresión del disenso por vía de sospecha."}, "152": {"texto": "ICNC", "pag": "28", "cod": "C11", "valor": "canales formales de disenso", "cita": "crossing arms in an", "nota": "Señas no verbales para el desacuerdo sin interrumpir al orador: el disenso se vuelve visible y continuo."}, "153": {"texto": "ICNC", "pag": "28", "cod": "C11", "valor": "sesgo de voz", "cita": "potentially opens space for social pressure", "nota": "La votación pública a mano alzada favorece la transparencia y abre espacio a la presión social (mecanismo de comparación social)."}, "157": {"texto": "Manić y Marković", "pag": "97", "cod": "C11", "valor": "asignación de roles", "cita": "Dodatni moderator se stara o vremenu i redosledu javljanja", "nota": "Roles separados: moderador, segundo moderador para tiempo y turnos, secretario de actas."}, "158": {"texto": "Manić y Marković", "pag": "97", "cod": "C11", "valor": "canales formales de disenso", "cita": "puna reč, replika i ukazivanje na tehničke greške", "nota": "Protocolo de palabra con réplica y señalamiento de errores técnicos."}, "160": {"texto": "Manić y Marković", "pag": "103", "cod": "C11", "valor": "protección o supresión del disenso", "cita": "Ako više ljudi kaže da nema dovoljno informacija", "nota": "Regla práctica: si varios dicen que falta información, no se vota todavía. El disenso informativo frena la decisión."}, "161": {"texto": "Manić y Marković", "pag": "105", "cod": "C11", "valor": "sesgo de voz", "cita": "marginalizovati registrovanje pasivnijih ili alternativnih glasova", "nota": "Límite metodológico que replica el sustantivo: la atención se concentra en oradores dominantes."}}, "corpus": [{"clave": "ICNC", "ref": "Škorić, Čikić, Škorić y Kišjuhas (2026), Anatomy of the Plenum. CNCR Special Report"}, {"clave": "Manić y Marković", "ref": "Manić y Marković (2026), Mogućnosti primene Balesovog klasifikacijskog sistema…, en BloKADA, ako ne SADA?, pp. 89–110"}, {"clave": "Pešić, Birešev y Marković", "ref": "Pešić, Birešev y Marković (2026), Odjekivanje tišine, en BloKADA, ako ne SADA?, pp. 211–228"}, {"clave": "Birešev, Marković y Pešić", "ref": "Birešev, Marković y Pešić (2026), Prefigurativna politika… Sociologija 68(2): 135–157"}, {"clave": "Dinić", "ref": "Dinić (2026), Studentski plenumi i opozicione partije…, en Glasovi promene, pp. 128–148"}, {"clave": "Radovanović, Radovanović y Nikolić", "ref": "Radovanović, Radovanović y Nikolić (2026), Civic initiatives of direct support… Sociologija 68(2): 158–181"}, {"clave": "Jakovljević y Pajović", "ref": "Jakovljević y Pajović (2026), Performing the Political Unknown. TDR 70(3)"}, {"clave": "Soyaltin-Colella y Ayan Musil", "ref": "Soyaltin-Colella y Ayan Musil (2026), Youth movements and opposition parties… Democratization"}, {"clave": "Ivković, Petrović Trifunović y Prodanović", "ref": "Ivković, Petrović Trifunović y Prodanović (2019), The Hybrid Discourse of the Serbian Antibureaucratic Revolution. Nationalities Papers"}, {"clave": "Bieber (entrevista, Burazer)", "ref": "Burazer (2025), entrevista a Florian Bieber, European Western Balkans, 17/10/2025"}], "usados": 106};
-var SIS=[
- {id:"s5",cod:"S5",nom:"Identidad y legitimidad",bajada:"Qué es el movimiento, en nombre de qué actúa y qué no está dispuesto a hacer."},
- {id:"s4",cod:"S4",nom:"Afuera y futuro",bajada:"Lo que aprende de otros, cómo se dirige a la sociedad, qué hace con las elecciones y la escena pública."},
- {id:"s3",cod:"S3",nom:"Recursos y protección",bajada:"Quién hace qué, cómo se reparten las tareas y cómo se protege a quienes ponen el cuerpo."},
- {id:"s3e",cod:"S3*",nom:"Verificación",bajada:"Cómo el pleno sabe lo que pasó y corrige lo que decidió."},
- {id:"s2",cod:"S2",nom:"Protocolo y coordinación",bajada:"Las reglas que evitan que la deliberación y las facultades se pisen."},
- {id:"s1",cod:"S1",nom:"Lo que hace",bajada:"Las acciones del movimiento en la calle y en las facultades."}
-];
-var sel="s2", riesgos=true;
+var CLAVE="mapa-pleno-v1";
 
+var NUMS=[
+ {id:"inicio",t:"Vinieron a la primera asamblea o al momento de más participación"},
+ {id:"vienen",t:"Vienen hoy a una asamblea típica"},
+ {id:"grupos",t:"Están en un grupo de trabajo"},
+ {id:"hablaron",t:"Hablaron en la última asamblea"},
+ {id:"roles",t:"Ocuparon un rol en el último mes (moderación, tiempos, actas, vocería)"}
+];
+var NUM_CORTO={inicio:"Al inicio",vienen:"Vienen hoy",grupos:"En grupos",hablaron:"Hablaron",roles:"Con rol"};
+
+var SECS=[
+ {id:"p",cod:"Gente",nombre:"Quiénes participan",bajada:"Cuánta gente sostiene la asamblea, cuánta habla y cuánta pasa por los roles. Números aproximados; si no saben uno, eso ya es un dato.",nums:true,qs:[
+  {id:"tipo",multi:true,texto:"¿Qué tipo de asamblea es?",ops:["Pleno de facultad","Asamblea estudiantil","Asamblea barrial","Asamblea de trabajadores","Cuerpo de delegados","Comité","Coordinadora entre asambleas"]}]},
+ {id:"s1",cod:"S1",nombre:"Lo que hace",bajada:"Las acciones que la asamblea decide y lleva adelante.",qs:[
+  {id:"acts",multi:true,texto:"¿Qué hace hoy la asamblea?",ops:["Toma o bloqueo","Movilizaciones","Actos y homenajes","Grupos de trabajo","Apoyo a conflictos","Comunicación propia","Formación","Acciones de visibilidad"]},
+  {id:"s1a",texto:"Lo que se decide en una asamblea, ¿se hace antes de la siguiente?",ops:[["Casi siempre",2],["A veces",1],["Casi nunca",0]]},
+  {id:"s1b",texto:"¿Cada grupo de trabajo informa a la asamblea lo que hizo?",ops:[["Siempre",2],["A veces",1],["No hay informes",0]]}]},
+ {id:"s2",cod:"S2",nombre:"Protocolo",bajada:"Las reglas que ordenan la deliberación: orden del día, tiempos, roles, formas de tomar la palabra.",qs:[
+  {id:"s2a",texto:"¿Se aprueba un orden del día al empezar?",ops:[["Sí, armado con propuestas de todos",2],["Lo trae resuelto un grupo chico",1],["No hay orden del día",0]]},
+  {id:"s2b",texto:"¿Hay tiempos por punto y por intervención, y alguien que los cuida?",ops:[["Sí, con una persona dedicada a eso",2],["A veces",1],["No",0]]},
+  {id:"s2c",texto:"¿Rotan la moderación, el control de tiempos y las actas?",ops:[["Rotan entre muchas personas",2],["Rotan entre pocas",1],["Siempre las mismas",0]]},
+  {id:"s2d",texto:"¿Hay una forma corta de marcar desacuerdo o corregir un dato sin pedir una intervención larga?",ops:[["Sí: señas, objeción técnica o réplica breve",2],["Se hace de manera informal",1],["No",0]]},
+  {id:"s2e",texto:"El ritmo de asambleas, ¿se puede sostener?",ops:[["Sí",2],["Cuesta",1],["Nos está agotando",0]]}]},
+ {id:"s3",cod:"S3",nombre:"Recursos y protección",bajada:"Quién hace qué, quién paga los costos y quién pone el cuerpo.",qs:[
+  {id:"s3a",texto:"¿Quién paga los costos de participar (viajes, comida, horas de trabajo perdidas)?",ops:[["Hay un fondo o una red que los reparte",2],["Cada uno pone lo que puede",1],["Solo siguen los que pueden pagarlo",0]]},
+  {id:"s3b",texto:"Quienes ponen el cuerpo (seguridad, vocería, los que dan la cara), ¿rotan y tienen respaldo de abogados o salud?",ops:[["Rotan y tienen respaldo",2],["Una de las dos cosas",1],["Ninguna",0]]},
+  {id:"s3c",texto:"Cuando una tarea es «de todos», ¿alguien la hace?",ops:[["Siempre queda un responsable",2],["A veces",1],["Termina sin hacerse",0]]}]},
+ {id:"s3e",cod:"S3*",nombre:"Verificación",bajada:"Cómo la asamblea sabe lo que pasó y corrige lo que decidió.",qs:[
+  {id:"s3ea",texto:"¿Se lleva acta y se aprueba en la asamblea siguiente?",ops:[["Sí",2],["Se lleva pero no se revisa",1],["No",0]]},
+  {id:"s3eb",texto:"Si aparece información nueva, ¿se puede revisar una decisión?",ops:[["Sí, hay un mecanismo",2],["En la práctica sí",1],["No",0]]},
+  {id:"s3ec",texto:"Después de una acción grande, ¿evalúan en colectivo qué salió bien y qué mal?",ops:[["Siempre",2],["A veces",1],["No",0]]},
+  {id:"s3ed",texto:"Si varias personas dicen que falta información, ¿se posterga la votación?",ops:[["Sí",2],["Depende",1],["Se vota igual",0]]},
+  {id:"s3ee",texto:"¿Se puede revocar a quien ocupa un rol?",ops:[["Sí, y se usaría",2],["Existe solo en el papel",1],["No",0]]}]},
+ {id:"s4",cod:"S4",nombre:"Afuera y lo que viene",bajada:"Lo que la asamblea aprende de otras, cómo cuenta lo que hace y cómo trata con quienes piensan distinto.",qs:[
+  {id:"s4a",texto:"¿Aprenden de otras asambleas o de experiencias anteriores?",ops:[["Sí, con intercambio regular",2],["Alguna vez",1],["No",0]]},
+  {id:"s4b",texto:"¿Tienen canales propios para contar lo que hacen?",ops:[["Sí",2],["Dependemos de medios de otros",1],["No",0]]},
+  {id:"s4c",texto:"¿Hablan con quienes piensan distinto (otras organizaciones, partidos, vecinos)?",ops:[["Sí, sin perder autonomía",2],["Solo con los afines",1],["Hablar con ellos se ve como traición",0]]}]},
+ {id:"s5",cod:"S5",nombre:"Quiénes somos",bajada:"Para qué existe la asamblea, dónde se decide de verdad y qué lugar tiene el disenso.",qs:[
+  {id:"s5a",texto:"Si le preguntan a cada participante para qué existe la asamblea, ¿qué pasa?",ops:[["Todos dicen algo parecido",2],["Cada uno dice otra cosa",1],["Nunca lo hablamos",0]]},
+  {id:"s5b",texto:"¿Alguien se volvió la cara o la voz permanente de la asamblea?",ops:[["No, la voz pública rota",2],["Hay figuras, pero no deciden por todos",1],["Sí, una o dos personas hablan por todos",0]]},
+  {id:"s5c",texto:"Quien está en desacuerdo, ¿se queda?",ops:[["Sí, y se lo escucha",2],["Se queda pero calla",1],["Se va, o lo acusan de sabotear",0]]},
+  {id:"s5d",texto:"Las decisiones importantes, ¿se toman en la asamblea?",ops:[["Sí",2],["A veces llegan cocinadas",1],["Las toma un grupo afuera y la asamblea ratifica",0]]}]}
+];
+
+var GUIA={
+ s1:{que:"Las acciones que la asamblea decide y ejecuta: tomas, movilizaciones, homenajes, grupos de trabajo, comunicación. La asamblea existe para esto; la deliberación sirve a la acción.",
+  se_ve:"Lo decidido se hace antes de la asamblea siguiente. Cada grupo informa lo que hizo.",
+  falta:"Las decisiones se repiten de asamblea en asamblea sin ejecutarse. Nadie informa.",
+  serbia:"Cada facultad bloqueada decidía en su pleno y pasaba sus decisiones al pleno universitario. Los grupos de trabajo cerraban un ciclo fijo: decisión, ejecución, informe obligatorio al pleno."},
+ s2:{que:"El protocolo de la deliberación: orden del día, tiempos, roles separados y rotativos, formas de tomar la palabra. Es lo que evita que la asamblea oscile entre el caos y el control de unos pocos.",
+  se_ve:"Orden del día aprobado al empezar. Tiempos cuidados por una persona dedicada. Roles que pasan por muchas manos. Una forma corta de disentir.",
+  falta:"La asamblea dura horas. Hablan siempre los mismos. El orden del día llega armado por un grupo chico.",
+  serbia:"Orden fijo en cada pleno; entre 1 y 3 minutos por orador; moderación rotativa, un segundo moderador para tiempos y una secretaría de actas; señas para mostrar acuerdo o desacuerdo; tres tipos de palabra: exposición, réplica y objeción técnica. Los plenos diarios se abandonaron por agotadores."},
+ s3:{que:"El reparto de tareas, recursos y riesgos. Quién paga por participar, quién pone el cuerpo y qué respaldo tiene.",
+  se_ve:"Los costos se reparten. Quienes se exponen rotan y tienen abogados y salud detrás. Cada tarea tiene un responsable.",
+  falta:"Solo siguen los que pueden pagarlo. Los mismos ponen siempre el cuerpo. Lo que es de todos no lo hace nadie.",
+  serbia:"El costo del alojamiento sacó del bloqueo a quienes no podían pagarlo, y cambió la composición del pleno. El servicio de orden estudiantil concentró los golpes. Una red ciudadana de abogados, salud y vecinos redujo el costo individual."},
+ s3e:{que:"La verificación: saber de verdad qué pasó y poder corregir. Actas, revisión de decisiones, evaluación después de cada acción, revocación de roles.",
+  se_ve:"El acta se aprueba en la asamblea siguiente. Las decisiones se revisan si aparece información nueva. Después de cada acción grande se evalúa en colectivo.",
+  falta:"Nadie sabe qué se resolvió la vez pasada. Una decisión mala no se puede corregir. Quien abusa de un rol no puede ser removido.",
+  serbia:"El acta como memoria colectiva; «toda decisión es revisable» como fuente de legitimidad; voto de desconfianza contra quien intenta imponerse; si varios dicen que falta información, no se vota todavía. Un pleno aprobó ser observado con un método de investigación, que registró la caída de motivación y la aparición de facciones."},
+ s4:{que:"Lo que mira hacia afuera: aprender de otras asambleas, contar lo propio, tratar con quienes piensan distinto sin perder autonomía.",
+  se_ve:"Intercambio regular con otras asambleas. Canales propios. Diálogo con otros actores sin que eso se lea como traición.",
+  falta:"La asamblea se cierra sobre sí misma. Depende de medios ajenos. Cualquier contacto externo se vive como amenaza.",
+  serbia:"Los plenos copiaron el manual de bloqueos de Zagreb y después escribieron reglamentos propios. La distancia frente a los partidos, táctica al principio, se volvió una norma de exclusión que silenció a quienes querían dialogar."},
+ s5:{que:"Lo que define a la asamblea: para qué existe, dónde se decide de verdad, quién habla en su nombre y qué lugar tiene el disenso.",
+  se_ve:"Acuerdo sobre el para qué. La voz pública rota. Las decisiones se toman en la asamblea. Quien disiente se queda y es escuchado.",
+  falta:"Una o dos caras hablan por todos. Las decisiones llegan cocinadas. Quien disiente se va o queda marcado como saboteador.",
+  serbia:"Nadie por encima de la comunidad: voceros que hablan en público una sola vez, sin filmar el pleno, rechazo explícito al culto a individuos. La lección de los noventa: los representantes fueron cooptados. El riesgo documentado: un núcleo duro que define los temas y la acusación de sabotaje contra quien propone otra estrategia."}
+};
+
+var EJEMPLOS=[
+ {id:"ej1",ejemplo:true,org:"Asamblea de Sociales",zona:"Interfacultades",fecha:"2026-08-12",
+  m:{tipo:["Asamblea estudiantil"],acts:["Toma o bloqueo","Movilizaciones","Grupos de trabajo"]},
+  n:{inicio:420,vienen:95,grupos:30,hablaron:12,roles:4},
+  r:{s1a:1,s1b:0,s2a:1,s2b:0,s2c:0,s2d:0,s2e:0,s3a:1,s3b:0,s3c:0,s3ea:1,s3eb:1,s3ec:0,s3ed:0,s3ee:0,s4a:0,s4b:1,s4c:1,s5a:1,s5b:1,s5c:1,s5d:1}},
+ {id:"ej2",ejemplo:true,org:"Asamblea de Sociales",zona:"Interfacultades",fecha:"2026-10-14",
+  m:{tipo:["Asamblea estudiantil"],acts:["Movilizaciones","Grupos de trabajo","Comunicación propia","Formación"]},
+  n:{inicio:420,vienen:110,grupos:46,hablaron:27,roles:14},
+  r:{s1a:2,s1b:1,s2a:2,s2b:2,s2c:1,s2d:2,s2e:1,s3a:1,s3b:1,s3c:1,s3ea:2,s3eb:2,s3ec:1,s3ed:2,s3ee:1,s4a:1,s4b:2,s4c:1,s5a:1,s5b:2,s5c:1,s5d:2}}
+];
+
+var EMB_BASE=[null,0,1,1,1];
+var NUM_REF={inicio:"los del inicio",vienen:"los que vienen hoy"};
+var TXT={herr:"Mapa del pleno",s3:"Recursos y protección",s2:"PROTOCOLO",sup:function(d){return d.zona?d.zona:"Coordinadora o asamblea general"},
+ embTit:"Quiénes participan",multiLbl:"Tipo",nomLbl:"Nombre de la asamblea",nomPh:"Ej.: Asamblea de Exactas",zonaLbl:"Espacio mayor (opcional)",zonaPh:"Ej.: Interfacultades",
+ compartir:"Compartir con la asamblea",
+ leer:"Arriba, el espacio mayor. Debajo, lo que dirige la asamblea; abajo de todo, lo que hace. La banda de la izquierda es el protocolo. El color indica qué tan firme está cada parte."};
+
+var st={vista:"inicio",paso:0,actual:null,verId:null,volver:"inicio",guardados:cargar(),confirmarBorrar:false,msg:""};
+
+function cargar(){try{var s=localStorage.getItem(CLAVE);return s?JSON.parse(s):[]}catch(e){return []}}
+function guardar(){try{localStorage.setItem(CLAVE,JSON.stringify(st.guardados));return true}catch(e){return false}}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function cuenta(id,tipo){return DATA[tipo].filter(function(x){return x.s===id}).length}
+function hoy(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fechaLinda(f){var m=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];var p=f.split("-");return +p[2]+" "+m[+p[1]-1]+" "+p[0]}
+function todos(){return st.guardados.length?st.guardados.slice():EJEMPLOS.slice()}
+function buscar(id){var t=todos().concat(st.actual?[st.actual]:[]);for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null}
+function SECS_VSM(){return SECS.filter(function(s){return s.id!=="p"})}
+function sec(id){for(var i=0;i<SECS.length;i++)if(SECS[i].id===id)return SECS[i]}
 
-function diagrama(){
-  var W=400,H=470;
-  var cajas={s5:[70,40,310,56],s4:[70,108,310,56],s3:[70,176,200,56],s3e:[280,176,100,56],s1:[70,300,310,150]};
-  var o=['<svg viewBox="0 0 '+W+' '+H+'" role="group" aria-label="Diagrama del Modelo de Sistema Viable">'];
-  o.push('<rect class="fondo-afuera" x="4" y="4" width="'+(W-8)+'" height="'+(H-8)+'" rx="14"/>');
-  o.push('<text class="lbl-afuera" x="16" y="24">Entorno: régimen, medios, partidos, sociedad</text>');
-  o.push('<path class="flecha" d="M225 96 V108 M225 164 V176 M170 232 V300 M330 232 V300"/>');
-  function nodo(id,x,y,w,h){
-    var s=SIS.filter(function(z){return z.id===id})[0], np=cuenta(id,"p"), nr=cuenta(id,"r");
-    var g='<g class="nodo'+(sel===id?" sel":"")+'" tabindex="0" role="button" aria-pressed="'+(sel===id)+'" data-id="'+id+'" aria-label="'+s.cod+' '+esc(s.nom)+': '+np+' prácticas, '+nr+' riesgos">';
-    g+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="9"/>';
-    g+='<text class="n-cod" x="'+(x+12)+'" y="'+(y+20)+'">'+s.cod+'</text>';
-    var nom=s.nom; if(w<150){nom=nom.split(" ")[0]}
-    g+='<text class="n-nom" x="'+(x+12)+'" y="'+(y+38)+'">'+esc(nom)+'</text>';
-    g+='<text class="n-cnt" x="'+(x+w-12)+'" y="'+(y+20)+'" text-anchor="end">'+np+'</text>';
-    if(nr){g+='<circle class="marca" cx="'+(x+w-10)+'" cy="'+(y+h-12)+'" r="9"/><text class="marca-t" x="'+(x+w-10)+'" y="'+(y+h-8)+'" text-anchor="middle">'+nr+'</text>'}
-    return g+'</g>';
+function nivel(d,s){
+  var tot=0,max=0;s.qs.forEach(function(q){if(q.multi)return;var v=d.r[q.id];if(v!=null){tot+=v;max+=2}});
+  var x=max?tot/max:0;return x<0.4?"falta":x<0.75?"fragil":"firme";
+}
+var NOMBRE_NIVEL={firme:"Firme",fragil:"Frágil",falta:"Falta"};
+function ratio(a,b){return b>0?a/b:null}
+
+function hallazgos(d){
+  var r=d.r,n=d.n||{},h=[];
+  function H(g,t,x,s,p){h.push({g:g,t:t,x:x,s:s,p:p})}
+  var queda=ratio(n.vienen,n.inicio), voz=ratio(n.hablaron,n.vienen), rol=ratio(n.roles,n.vienen);
+  if(queda!=null&&queda<0.4)H("falta","La asamblea se vació desde el inicio.","De "+n.inicio+" al principio, hoy vienen "+n.vienen+".","En Serbia la participación pasó de la euforia al agotamiento y quedó un núcleo duro, sin factor de corrección.","¿Qué haría falta para que vuelvan quienes dejaron de venir?");
+  if(voz!=null&&voz<0.25)H("falta","Hablan siempre los mismos.","De "+n.vienen+" que vienen, "+n.hablaron+" hablaron en la última asamblea.","En Serbia la deliberación solo oral favoreció a quienes ya sabían hablar en público.","¿Qué forma de participar sin tomar la palabra larga pueden sumar (señas, ronda breve, propuestas por escrito)?");
+  if((rol!=null&&rol<0.15)||r.s2c===0)H(r.s2c===0?"falta":"fragil","Los roles circulan entre pocos.",(n.roles!=null?n.roles+" personas ocuparon un rol en el último mes. ":"")+"La rotación existe en el papel, pero no reparte la experiencia.","En Serbia la moderación rotaba por reglamento y aun así quedó en un círculo chico, porque pocos aceptaban el rol.","¿Quién nuevo puede moderar o llevar el acta en la próxima asamblea, acompañado por alguien con experiencia?");
+  if(r.s2a===1||r.s5d===1||r.s5d===0)H(r.s5d===0?"falta":"fragil","Las decisiones llegan cocinadas.","El orden del día o las decisiones se arman fuera de la asamblea.","En Serbia las reuniones de coordinación nocturnas vaciaron el pleno: decidían y después comunicaban.","¿Cómo se arma el orden del día de la próxima asamblea, y quién puede proponer puntos?");
+  if(r.s2b===0)H("fragil","Nadie cuida los tiempos.","Sin tiempos por punto y por intervención, la asamblea se alarga y se van primero quienes tienen menos tiempo.","En Serbia un segundo moderador se ocupaba solo de tiempos y turnos; las intervenciones duraban entre 1 y 3 minutos.","¿Quién cuida los tiempos en la próxima asamblea, y con qué límite?");
+  if(r.s2d===0)H("fragil","No hay forma corta de disentir.","Para marcar un desacuerdo o corregir un dato hay que pedir una intervención larga.","En Serbia las señas mostraban acuerdo y desacuerdo sin interrumpir, y la objeción técnica corregía un dato sin abrir el debate.","¿Qué seña o regla pueden adoptar para disentir o corregir sin pedir la palabra?");
+  if(r.s2e===0)H("falta","El ritmo los está agotando.","Una asamblea que agota a sus participantes pierde primero a quienes tienen menos tiempo.","En Serbia los plenos diarios se abandonaron, y los autores señalan la falta de mecanismos de relevo como la debilidad principal.","¿Qué ritmo pueden sostener tres meses más, y qué se delega a grupos?");
+  if(r.s3a===0)H("falta","Participar cuesta y expulsa.","Solo siguen quienes pueden pagar los costos de participar.","En Serbia el costo del alojamiento sacó del bloqueo a quienes no podían pagarlo y cambió la composición del pleno.","¿Qué fondo o red puede cubrir el costo más pesado?");
+  if(r.s3b!=null&&r.s3b<2)H(r.s3b===0?"falta":"fragil","Los mismos ponen el cuerpo.","La exposición no rota o no tiene respaldo.","En Serbia el servicio de orden concentró los golpes; abogados, salud y vecinos armaron una red de apoyo gratuita.","¿Con qué abogado, médico o psicóloga pueden contar, y cómo rota la exposición?");
+  if(r.s3c===0)H("falta","Lo que es de todos no lo hace nadie.","Las tareas colectivas quedan sin responsable.","En Serbia se documentó el mismo efecto: la responsabilidad colectiva se volvió de nadie en las decisiones que pedían participación masiva.","¿Qué tarea de todos necesita un responsable con nombre de rol esta semana?");
+  if(nivel(d,sec("s3e"))!=="firme")H(nivel(d,sec("s3e")),"La asamblea no se corrige.","Faltan actas aprobadas, revisión de decisiones o evaluación después de las acciones.","En Serbia el acta se aprobaba al inicio del pleno siguiente, toda decisión era revisable y cada acción grande se evaluaba en colectivo.","¿Quién lleva el acta, y en qué momento de la próxima asamblea se revisa?");
+  if(r.s3ed===0)H("fragil","Se vota sin información.","Se decide aunque varias personas digan que falta información.","En Serbia regía una regla práctica: si varios dicen que falta información, todavía no se vota.","¿Pueden adoptar esa regla en la próxima asamblea?");
+  if(r.s4c===0)H("falta","Cámara de eco.","Hablar con quienes piensan distinto se vive como traición.","En Serbia la distancia frente a los partidos pasó de táctica a norma de exclusión y silenció a quienes querían dialogar.","¿Con quién de afuera podrían conversar sin perder autonomía, y quién lo decide?");
+  if(r.s5b===0)H("falta","La asamblea tiene dueño de la voz.","Una o dos personas hablan siempre por todos.","En Serbia cada estudiante podía hablar en público una sola vez: la lección de los noventa fue que los representantes terminaron cooptados.","¿Quién habla en nombre de la asamblea la próxima vez, y cuándo rota?");
+  if(r.s5c!=null&&r.s5c<2)H(r.s5c===0?"falta":"fragil","El disenso se va.","Quien está en desacuerdo calla o deja de venir.","En Serbia la acusación de sabotaje se usó contra quien proponía otra estrategia; los disidentes se retiraron y el pleno perdió oposición interna.","¿Cómo puede alguien proponer otra estrategia sin quedar marcado?");
+  if(r.s1b===0)H("fragil","Los grupos no informan.","Lo que hacen los grupos de trabajo no vuelve a la asamblea.","En Serbia cada grupo cerraba el ciclo con un informe obligatorio al pleno.","¿En qué momento de la asamblea informa cada grupo?");
+  return h;
+}
+
+function color(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+function diagrama(d){
+  var C={tinta:color("--tinta"),suave:color("--tinta-suave"),tarjeta:color("--tarjeta"),borde:color("--borde"),papel:color("--papel")};
+  function fill(n){return color("--"+n+"-bg")} function stroke(n){return color("--"+n)}
+  var n={};SECS_VSM().forEach(function(s){n[s.id]=nivel(d,s)});
+  var acts=((d.m&&d.m.acts&&d.m.acts.length)?d.m.acts:["Intervención"]).slice(0,8);
+  var off=58, filas=Math.ceil(acts.length/2), h1=filas*64+40, H=off+250+h1+20, W=360;
+  var o=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="system-ui,sans-serif" role="img" aria-label="Mapa de la asamblea">'];
+  o.push('<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="'+C.papel+'"/>');
+  function caja(x,y,w,h,id,cod,txt){
+    o.push('<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" fill="'+fill(n[id])+'" stroke="'+stroke(n[id])+'" stroke-width="2"/>');
+    o.push('<text x="'+(x+10)+'" y="'+(y+20)+'" font-size="12" font-weight="700" fill="'+stroke(n[id])+'">'+cod+' · '+NOMBRE_NIVEL[n[id]].toUpperCase()+'</text>');
+    o.push('<text x="'+(x+10)+'" y="'+(y+38)+'" font-size="14" fill="'+C.tinta+'">'+esc(txt)+'</text>');
   }
-  Object.keys(cajas).forEach(function(k){var c=cajas[k];o.push(nodo(k,c[0],c[1],c[2],c[3]))});
-  // S2 banda lateral
-  var s2sel=sel==="s2", np=cuenta("s2","p"), nr=cuenta("s2","r");
-  o.push('<g class="nodo'+(s2sel?" sel":"")+'" tabindex="0" role="button" aria-pressed="'+s2sel+'" data-id="s2" aria-label="S2 Protocolo y coordinación: '+np+' prácticas, '+nr+' riesgos">');
-  o.push('<rect x="16" y="40" width="44" height="410" rx="9"/>');
-  o.push('<text class="n-cod" x="38" y="245" text-anchor="middle" transform="rotate(-90 38 245)">S2 · PROTOCOLO</text>');
-  o.push('<text class="n-cnt" x="38" y="60" text-anchor="middle">'+np+'</text>');
-  if(nr)o.push('<circle class="marca" cx="38" cy="434" r="9"/><text class="marca-t" x="38" y="438" text-anchor="middle">'+nr+'</text>');
-  o.push('</g>');
-  // facultades dentro de S1
-  [["Facultad",0],["Facultad",1],["Calle",2],["Barrios",3]].forEach(function(f,i){
-    var x=86+(i%2)*150, y=350+Math.floor(i/2)*46;
-    o.push('<rect x="'+x+'" y="'+y+'" width="132" height="34" rx="17" fill="none" stroke="currentColor" stroke-opacity=".35" pointer-events="none"/>');
-    o.push('<text x="'+(x+66)+'" y="'+(y+22)+'" text-anchor="middle" font-size="12" fill="currentColor" fill-opacity=".7" pointer-events="none">'+f[0]+'</text>');
+  o.push('<text x="10" y="18" font-size="15" font-weight="700" fill="'+C.tinta+'">'+esc(d.org)+'</text>');
+  o.push('<text x="'+(W-10)+'" y="18" font-size="12" text-anchor="end" fill="'+C.suave+'">'+fechaLinda(d.fecha)+'</text>');
+  // Nivel superior (recursividad)
+  o.push('<rect x="60" y="30" width="290" height="34" rx="8" fill="none" stroke="'+C.suave+'" stroke-width="1.5" stroke-dasharray="5 4"/>');
+  o.push('<text x="70" y="52" font-size="12" fill="'+C.suave+'">'+esc(TXT.sup(d))+'</text>');
+  o.push('<line x1="205" y1="64" x2="205" y2="'+(30+off)+'" stroke="'+stroke(n.s5)+'" stroke-width="2"/>');
+  caja(60,30+off,290,50,"s5","S5","Quiénes somos");
+  caja(60,92+off,290,50,"s4","S4","Afuera y lo que viene");
+  caja(60,154+off,180,50,"s3","S3",TXT.s3);
+  caja(246,154+off,104,50,"s3e","S3*","Verificación");
+  var y2=216+off, bandaH=y2+h1-(30+off), bandaY=30+off;
+  o.push('<rect x="10" y="'+bandaY+'" width="40" height="'+bandaH+'" rx="8" fill="'+fill(n.s2)+'" stroke="'+stroke(n.s2)+'" stroke-width="2"/>');
+  var cy0=bandaY+bandaH/2;
+  o.push('<text x="30" y="'+cy0+'" font-size="12" font-weight="700" fill="'+stroke(n.s2)+'" text-anchor="middle" transform="rotate(-90 30 '+cy0+')">S2 · '+TXT.s2+' · '+NOMBRE_NIVEL[n.s2].toUpperCase()+'</text>');
+  o.push('<rect x="60" y="'+y2+'" width="290" height="'+h1+'" rx="8" fill="'+C.tarjeta+'" stroke="'+stroke(n.s1)+'" stroke-width="2"/>');
+  o.push('<text x="70" y="'+(y2+20)+'" font-size="12" font-weight="700" fill="'+stroke(n.s1)+'">S1 · LO QUE HACE · '+NOMBRE_NIVEL[n.s1].toUpperCase()+'</text>');
+  acts.forEach(function(a,i){
+    var cx=70+(i%2)*140, cy=y2+32+Math.floor(i/2)*64;
+    o.push('<rect x="'+cx+'" y="'+cy+'" width="130" height="52" rx="26" fill="'+fill(n.s1)+'" stroke="'+stroke(n.s1)+'" stroke-width="1.5"/>');
+    var pal=a.split(" "), l1="", l2="";
+    pal.forEach(function(w){if((l1+" "+w).trim().length<=16&&!l2)l1=(l1+" "+w).trim();else l2=(l2+" "+w).trim()});
+    o.push('<text x="'+(cx+65)+'" y="'+(cy+(l2?22:31))+'" font-size="12" text-anchor="middle" fill="'+C.tinta+'">'+esc(l1)+'</text>');
+    if(l2)o.push('<text x="'+(cx+65)+'" y="'+(cy+38)+'" font-size="12" text-anchor="middle" fill="'+C.tinta+'">'+esc(l2.slice(0,18))+'</text>');
   });
-  o.push('</svg>');
-  var d=document.getElementById("diag"); d.innerHTML=o.join(""); d.style.color=getComputedStyle(document.documentElement).getPropertyValue("--tinta");
-  d.querySelector("svg").classList.toggle("marcas-off",!riesgos);
+  o.push('</svg>');return o.join("");
 }
 
-function pasajes(refs){
-  return '<details class="evid"><summary>Evidencia: '+refs.length+' pasaje'+(refs.length>1?"s":"")+'</summary><div class="pasajes">'+refs.map(function(n){
-    var p=DATA.pas[n];
-    return '<div class="pasaje"><q lang="'+(/[šđčćž]|[a-z]{3,} (je|su|se|na|da) /i.test(p.cita)?"sr-Latn":"en")+'">'+esc(p.cita)+'</q><span>'+esc(p.nota)+'</span><span class="ref">'+esc(p.texto)+', p. '+esc(p.pag)+' · pasaje '+n+' · '+esc(p.cod)+' '+esc(p.valor)+'</span></div>';
-  }).join("")+'</div></details>';
+function embudo(d){
+  var n=d.n||{}, max=Math.max.apply(null,[1].concat(NUMS.map(function(x){return +n[x.id]||0})));
+  return '<div class="embudo">'+NUMS.map(function(x,i){
+    var v=n[x.id]||0, b=EMB_BASE[i], base=b!=null?n[NUMS[b].id]:null, pct=(base>0)?Math.round(100*v/base)+"% de "+NUM_REF[NUMS[b].id]:"";
+    return '<div class="eb-fila"><span>'+NUM_CORTO[x.id]+'<br><span class="eb-pct">'+pct+'</span></span><div class="eb-barra"><span style="width:'+(100*v/max)+'%"></span></div><span class="eb-num">'+v+'</span></div>';
+  }).join("")+'</div>';
 }
 
-function panel(){
-  var s=SIS.filter(function(z){return z.id===sel})[0];
-  var P=DATA.p.filter(function(x){return x.s===sel}), R=DATA.r.filter(function(x){return x.s===sel});
-  var h='<div class="panel-cab"><span class="etq">'+s.cod+'</span><h2>'+esc(s.nom)+'</h2><p>'+esc(s.bajada)+'</p></div>';
-  h+='<div class="lista">'+P.map(function(x){return '<article class="item practica"><span class="tipo p">Práctica</span><h3>'+esc(x.t)+'</h3><p>'+esc(x.d)+'</p>'+pasajes(x.refs)+'</article>'}).join("");
-  h+=R.map(function(x){return '<article class="item riesgo"><span class="tipo r">Riesgo</span><h3>'+esc(x.t)+'</h3><p>'+esc(x.d)+'</p>'+pasajes(x.refs)+'</article>'}).join("")+'</div>';
-  document.getElementById("panel").innerHTML=h;
+function resumenTexto(d){
+  var n=d.n||{};
+  var t=[TXT.herr+": "+d.org+(d.zona?" ("+d.zona+")":"")+", "+fechaLinda(d.fecha),"",
+    "Gente: "+NUMS.map(function(x){return NUM_CORTO[x.id].toLowerCase()+" "+(n[x.id]||0)}).join(", "),""];
+  SECS_VSM().forEach(function(s){t.push(s.cod+" "+s.nombre+": "+NOMBRE_NIVEL[nivel(d,s)])});
+  var h=hallazgos(d);
+  if(h.length){t.push("","Lo que aparece:");h.forEach(function(x){t.push("• "+x.t+" "+x.p)})}
+  return t.join("\n");
 }
 
-var LEC=[
- {t:"Rotar con reglas, y medir si rota",d:"Moderación, tiempos y actas rotan por reglamento. La rotación formal igual termina concentrada en un círculo chico porque pocos aceptan el rol. Hay que contar quién ocupó cada rol en el último mes.",a:"Pleno: S2 y embudo de roles · Comité: S2"},
- {t:"Una verificación que se usa",d:"Actas aprobadas al inicio, decisiones revisables, voto de desconfianza y evaluación después de cada acción grande. Es el S3* más completo del corpus.",a:"Pleno y Comité: S3* · Orga: S3*"},
- {t:"Un protocolo que protege el disenso",d:"Objeción técnica, señas de desacuerdo y la regla de no votar cuando varios dicen que falta información. El riesgo opuesto también está documentado: la etiqueta de sabotaje anula el derecho a hablar.",a:"Pleno: Protocolo · Comité: S5"},
- {t:"Voz pública que no se acumula",d:"Voceros que hablan una sola vez, anonimato y rechazo explícito al culto a individuos. Evita la cooptación de representantes, la lección de los años noventa.",a:"Pleno y Comité: S5"},
- {t:"Repartir el costo y la exposición",d:"El alojamiento expulsó a quienes no podían pagarlo, y el servicio de orden concentró los golpes. La red ciudadana de abogados, salud y vecinos redujo el costo individual.",a:"Pleno y Comité: S3 · Orga: S1"},
- {t:"Ritmo sostenible y relevo",d:"Los plenos diarios se abandonaron y el núcleo inicial se retiró agotado. Los propios autores señalan la falta de mecanismos de transición como la debilidad principal.",a:"Pleno, Comité y Orga: S2 y S3"}
-];
-
-function lecciones(){document.getElementById("lecciones").innerHTML=LEC.map(function(l){return '<div class="lec"><h3>'+esc(l.t)+'</h3><p>'+esc(l.d)+'</p><span class="dest">'+esc(l.a)+'</span></div>'}).join("")}
-function corpus(){
-  document.getElementById("corpus").innerHTML='<strong>Fuente</strong><p>Codificación piloto del corpus sobre el movimiento estudiantil serbio (161 pasajes en 11 códigos, citas verificadas contra los PDF). El mapa usa '+DATA.usados+' de esos pasajes. La profundidad de lectura varía por texto, de la lectura completa a la búsqueda dirigida por códigos, así que la cantidad de evidencia de cada sistema refleja la búsqueda y no el peso del fenómeno.</p><ul>'+DATA.corpus.map(function(c){return '<li>'+esc(c.ref)+'</li>'}).join("")+'</ul>';
+/* ---------- vistas ---------- */
+function vInicio(){
+  var ej=todos()[todos().length-1];
+  return '<div class="pila">'+
+  '<div class="pila" style="gap:8px"><span class="etq">Para asambleas, plenos y cuerpos de delegados</span><h1>Mapa del Pleno</h1>'+
+  '<p>Veinte minutos de preguntas, en grupo, para ver si la asamblea decide de verdad, quién habla, quién pone el cuerpo y si puede corregirse. Las preguntas salen de los plenos del movimiento estudiantil serbio de 2024 a 2026: lo que les funcionó y lo que los desgastó. Al final queda un mapa y una pregunta concreta para cada problema.</p></div>'+
+  '<div class="fila"><button class="btn" data-a="nuevo">Empezar un mapa</button>'+(st.guardados.length?'<button class="btn sec" data-a="historial">Mis mapas ('+st.guardados.length+')</button>':'<button class="btn sec" data-a="historial">Ver ejemplos</button>')+'<button class="btn sec" data-a="guia">Qué mira cada parte</button></div>'+
+  '<div class="tarjeta"><div class="fila entre"><h3>'+esc(ej.org)+'</h3>'+(ej.ejemplo?'<span class="ejemplo">Ejemplo</span>':'')+'</div>'+
+  embudo(ej)+'<button class="btn sec" data-a="ver" data-id="'+ej.id+'">Ver el mapa completo</button></div>'+
+  '<div class="tarjeta"><h3>Cómo se usa</h3><p>Háganlo al final de una asamblea, o en un grupo chico con gente de distintos grupos de trabajo. Que no lo modere quien modera siempre. Una persona lee las preguntas y marca lo que el grupo acuerda. Si no hay acuerdo, marquen la opción más baja y anótenlo.</p><p>Repitan el mapa cada dos o tres meses. Las asambleas cambian rápido: lo que hoy funciona puede desgastarse.</p></div>'+
+  vInstalar()+vDatos()+vFirma()+'</div>';
+}
+function vFirma(){
+  return '<p class="chico">Herramienta independiente. Las referencias al movimiento serbio salen de una codificación piloto de estudios académicos publicados entre 2025 y 2026. Por Ordalie.</p>';
+}
+function vInstalar(){
+  return '<details class="tarjeta guia-paso"><summary>Instalarla en el teléfono</summary><div class="pila" style="gap:8px">'+
+  '<p>Abrí el link de la app una vez, con conexión. Después:</p>'+
+  '<p><strong>iPhone:</strong> en Safari tocá el botón Compartir y elegí «Agregar a pantalla de inicio».</p>'+
+  '<p><strong>Android:</strong> en Chrome tocá el menú de tres puntos y elegí «Instalar app» o «Agregar a la pantalla principal».</p>'+
+  '<p>Desde ese momento aparece con su ícono y funciona sin datos. Los mapas quedan guardados en ese teléfono.</p></div></details>';
+}
+function bloqueGuia(id){
+  var g=GUIA[id];
+  return '<div class="pila" style="gap:8px"><p>'+g.que+'</p>'+
+  '<p><span class="estado e-firme">Cuando está firme</span><br>'+g.se_ve+'</p>'+
+  '<p><span class="estado e-falta">Cuando falta</span><br>'+g.falta+'</p>'+
+  (g.serbia?'<p><span class="estado e-serbia">En el movimiento serbio</span><br>'+g.serbia+'</p>':'')+'</div>';
+}
+function vGuia(){
+  var secs=SECS_VSM().slice().reverse().map(function(s){
+    return '<div class="tarjeta"><div class="pila" style="gap:4px"><span class="etq">'+s.cod+'</span><h3>'+s.nombre+'</h3></div>'+bloqueGuia(s.id)+'</div>';
+  }).join("");
+  return '<div class="pila"><div class="fila entre"><button class="btn sec" data-a="volver">Volver</button></div>'+
+  '<div class="pila" style="gap:8px"><span class="etq">Referencia</span><h2>Qué mira cada parte</h2>'+
+  '<p>El mapa usa el Modelo de Sistema Viable, del cibernético inglés Stafford Beer. Una organización es viable cuando puede sostenerse frente a lo que le pasa. Para eso necesita cinco funciones, más la verificación. En una asamblea, esas funciones se cumplen o fallan en cosas concretas: quién arma el orden del día, quién lleva el acta, quién habla afuera, quién paga el viaje.</p></div>'+
+  '<div class="tarjeta"><h3>Cómo leer el dibujo</h3><p>Abajo, lo que la asamblea hace (S1). La banda de la izquierda es el protocolo (S2): las reglas de la deliberación. Más arriba, los recursos y la protección (S3) y la verificación (S3*). Después, lo que mira afuera (S4) y quiénes son (S5). El recuadro punteado de arriba es el espacio mayor: la coordinadora, la asamblea general o la red de asambleas.</p></div>'+
+  '<div class="tarjeta"><h3>Quiénes participan</h3><p>Las barras muestran cuánta gente queda del momento de más participación, y de quienes vienen hoy cuántos están en grupos, cuántos hablaron y cuántos ocuparon un rol. Una asamblea grande donde hablan pocos y los roles circulan entre pocos tiene el riesgo serbio más documentado: la oligarquización informal, aunque el reglamento diga que todo rota.</p></div>'+
+  secs+
+  '<div class="tarjeta"><h3>De dónde salen las preguntas</h3><p>Entre noviembre de 2024 y 2026, los estudiantes serbios bloquearon facultades y decidieron todo en plenos abiertos, con reglas escritas por ellos mismos. Investigadores serbios estudiaron esos plenos desde adentro y desde afuera. La codificación piloto que alimenta este mapa reúne 161 pasajes de esos estudios, y el mapa usa los que hablan de protocolo, verificación, costos, voz pública y disenso.</p>'+
+  '<p>Los plenos serbios no son un modelo para copiar. Funcionaron durante una emergencia, con estudiantes que podían dedicarle todo el día, y los propios participantes dudan de que la forma escale. Sirven como banco de pruebas: muestran qué reglas sostienen una asamblea grande y dónde se rompe.</p></div>'+
+  '<div class="tarjeta"><h3>Tres ideas que atraviesan todo</h3>'+
+  '<p><strong>La regla no alcanza: hay que medir.</strong> En Serbia la moderación rotaba por reglamento y terminó en un círculo chico. Contar cuántos hablaron y cuántos ocuparon un rol muestra si la rotación es real.</p>'+
+  '<p><strong>El disenso es información.</strong> Una asamblea que expulsa al que piensa distinto pierde la capacidad de ver sus errores. En términos de Ashby, reduce su propia variedad justo cuando más la necesita.</p>'+
+  '<p><strong>El costo decide quién se queda.</strong> Si participar cuesta plata, tiempo o golpes, la asamblea termina formada por quienes pueden pagarlo, y eso cambia lo que decide.</p></div></div>';
+}
+function vDatos(){
+  return '<div class="aviso pila" style="gap:6px"><strong>Cómo se cuidan los datos.</strong> Todo queda guardado en este teléfono. Nada se manda a ningún lado. La app no pide nombres de personas: solo cantidades y roles. Pueden borrar todo desde «Mis mapas».</div>';
+}
+function completoPaso(d,i){
+  var s=SECS[i];
+  var ok=s.qs.every(function(q){return q.multi?(d.m[q.id]||[]).length>0:d.r[q.id]!=null});
+  if(s.nums)ok=ok&&NUMS.every(function(x){return d.n[x.id]!=null&&d.n[x.id]!==""&&!isNaN(d.n[x.id])});
+  if(i===0)ok=ok&&d.org.trim().length>0;
+  return ok;
+}
+function vPaso(){
+  var d=st.actual, s=SECS[st.paso];
+  var pasos=SECS.map(function(x,i){return '<div class="paso'+(i<st.paso?" hecho":"")+(i===st.paso?" ahora":"")+'">'+x.cod+'</div>'}).join("");
+  var cab=st.paso===0?'<div class="tarjeta"><div class="pila" style="gap:6px"><label class="etq" for="org">'+TXT.nomLbl+'</label><input type="text" id="org" maxlength="60" placeholder="'+TXT.nomPh+'" value="'+esc(d.org)+'"></div>'+
+    '<div class="pila" style="gap:6px"><label class="etq" for="zona">'+TXT.zonaLbl+'</label><input type="text" id="zona" maxlength="60" placeholder="'+TXT.zonaPh+'" value="'+esc(d.zona)+'"></div></div>':"";
+  var nums=s.nums?'<div class="tarjeta"><h3>¿Cuántas personas?</h3><p class="chico">Números aproximados, del último mes o dos.</p>'+NUMS.map(function(x){
+    return '<div class="num"><label for="n-'+x.id+'">'+x.t+'</label><input type="number" inputmode="numeric" min="0" id="n-'+x.id+'" data-n="'+x.id+'" value="'+(d.n[x.id]!=null?d.n[x.id]:"")+'"></div>'}).join("")+'</div>':"";
+  var qs=s.qs.map(function(q){
+    if(q.multi){
+      var sel=d.m[q.id]||[];
+      return '<div class="tarjeta"><h3>'+esc(q.texto)+'</h3><p class="chico">Marquen todas las que correspondan.</p><div class="chips">'+q.ops.map(function(o){
+        return '<button class="chip" aria-pressed="'+(sel.indexOf(o)>=0)+'" data-a="multi" data-q="'+q.id+'" data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join("")+'</div></div>';
+    }
+    return '<div class="tarjeta"><h3>'+esc(q.texto)+'</h3><div class="ops">'+q.ops.map(function(o){
+      return '<button class="op" aria-pressed="'+(d.r[q.id]===o[1])+'" data-a="resp" data-q="'+q.id+'" data-v="'+o[1]+'">'+esc(o[0])+'</button>'}).join("")+'</div></div>';
+  }).join("");
+  var guia=GUIA[s.id]?'<details class="tarjeta guia-paso"><summary>Qué mira esta parte</summary>'+bloqueGuia(s.id)+'</details>':"";
+  return '<div class="pila"><div class="fila entre"><button class="btn sec" data-a="inicio">Salir</button><span class="chico">Paso '+(st.paso+1)+' de '+SECS.length+'</span></div>'+
+  '<div class="pasos">'+pasos+'</div>'+cab+
+  '<div class="pila" style="gap:4px"><span class="etq">'+s.cod+'</span><h2>'+s.nombre+'</h2><p class="chico">'+s.bajada+'</p></div>'+guia+nums+qs+
+  '<div class="fila entre"><button class="btn sec" data-a="atras"'+(st.paso===0?" disabled":"")+'>Anterior</button><button class="btn" data-a="sig" id="sig"'+(completoPaso(d,st.paso)?"":" disabled")+'>'+(st.paso===SECS.length-1?"Ver el mapa":"Siguiente")+'</button></div></div>';
+}
+function vResultado(){
+  var d=buscar(st.verId); if(!d){st.vista="inicio";return vInicio()}
+  var h=hallazgos(d);
+  var niveles=SECS_VSM().map(function(s){var n=nivel(d,s);return '<li><span><strong>'+s.cod+'</strong> '+s.nombre+'</span><span class="estado e-'+n+'">'+NOMBRE_NIVEL[n]+'</span></li>'}).join("");
+  var hl=h.length?h.map(function(x){return '<div class="hallazgo '+(x.g==="fragil"?"fragil":"")+'"><strong>'+x.t+'</strong><span>'+x.x+'</span>'+(x.s?'<span class="serbia">'+x.s+'</span>':'')+'<span class="preg">Para la próxima reunión: '+x.p+'</span></div>'}).join(""):'<p>No aparecen puntos débiles fuertes. Repitan el mapa en dos o tres meses para ver si se sostiene.</p>';
+  var mq=SECS[0].qs[0].id, mv=(d.m&&d.m[mq])||[];
+  var sect=mv.length?'<p class="chico">'+TXT.multiLbl+': '+mv.map(esc).join(", ")+'</p>':"";
+  return '<div class="pila"><div class="fila entre"><button class="btn sec" data-a="inicio">Inicio</button>'+(d.ejemplo?'<span class="ejemplo">Ejemplo</span>':'')+'</div>'+
+  '<div class="pila" style="gap:4px"><span class="etq">Mapa · '+fechaLinda(d.fecha)+(d.zona?' · '+esc(d.zona):'')+'</span><h2>'+esc(d.org)+'</h2></div>'+
+  '<div class="tarjeta"><h3>'+TXT.embTit+'</h3>'+embudo(d)+sect+'</div>'+
+  '<div class="tarjeta"><div class="diagrama">'+diagrama(d)+'</div><p class="chico">'+TXT.leer+'</p></div>'+
+  '<div class="tarjeta"><h3>Lo que aparece</h3>'+hl+'</div>'+
+  '<div class="tarjeta"><h3>Cada parte</h3><ul class="lista">'+niveles+'</ul><button class="btn sec" data-a="guia">Qué mira cada parte</button></div>'+comparacion(d)+
+  '<div class="tarjeta"><h3>'+TXT.compartir+'</h3><div class="fila"><button class="btn" data-a="copiar">Copiar resumen para WhatsApp</button><button class="btn sec" data-a="imagen">Compartir imagen del mapa</button></div><p class="chico" id="msg">'+esc(st.msg)+'</p><p class="chico">La imagen se puede compartir desde la app instalada en el teléfono o abierta en la compu. Para instalarla, mirá «Instalarla en el teléfono» en el inicio.</p></div></div>';
+}
+function comparacion(d){
+  var mismos=todos().filter(function(x){return x.org.trim().toLowerCase()===d.org.trim().toLowerCase()&&x.fecha<d.fecha}).sort(function(a,b){return a.fecha<b.fecha?1:-1});
+  if(!mismos.length)return "";
+  var p=mismos[0], orden={falta:0,fragil:1,firme:2};
+  var filas=SECS_VSM().map(function(s){var a=nivel(p,s),b=nivel(d,s);var c=orden[b]-orden[a];
+    return '<strong>'+s.cod+'</strong><span class="estado e-'+a+'">'+NOMBRE_NIVEL[a]+'</span><span><span class="estado e-'+b+'">'+NOMBRE_NIVEL[b]+'</span> '+(c>0?"↑ mejoró":c<0?"↓ empeoró":"= igual")+'</span>'}).join("");
+  var nf=NUMS.map(function(x){var a=(p.n||{})[x.id]||0,b=(d.n||{})[x.id]||0;
+    return '<span>'+NUM_CORTO[x.id]+'</span><span style="font-variant-numeric:tabular-nums">'+a+'</span><span style="font-variant-numeric:tabular-nums">'+b+(b>a?" ↑":b<a?" ↓":"")+'</span>'}).join("");
+  return '<div class="tarjeta"><h3>Cambio desde el '+fechaLinda(p.fecha)+'</h3><div class="cmp"><span></span><span class="etq">Antes</span><span class="etq">Ahora</span>'+nf+filas+'</div></div>';
+}
+function vHistorial(){
+  var t=todos().sort(function(a,b){return a.fecha<b.fecha?1:-1});
+  var items=t.map(function(d){return '<li><span><strong>'+esc(d.org)+'</strong><br><span class="chico">'+fechaLinda(d.fecha)+(d.zona?' · '+esc(d.zona):'')+'</span> '+(d.ejemplo?'<span class="ejemplo">Ejemplo</span>':'')+'</span><button class="btn sec" data-a="ver" data-id="'+d.id+'">Abrir</button></li>'}).join("");
+  var borrar=st.guardados.length?(st.confirmarBorrar?
+    '<div class="tarjeta"><p><strong>¿Borrar los '+st.guardados.length+' mapas de este teléfono?</strong> No se pueden recuperar.</p><div class="fila"><button class="btn peligro" data-a="borrarSi">Sí, borrar todo</button><button class="btn sec" data-a="borrarNo">Cancelar</button></div></div>':
+    '<button class="btn peligro" data-a="borrar">Borrar todo</button>'):'<p class="chico">Todavía no hay mapas propios. Estos son ejemplos para ver cómo funciona.</p>';
+  return '<div class="pila"><div class="fila entre"><button class="btn sec" data-a="inicio">Inicio</button><button class="btn" data-a="nuevo">Nuevo mapa</button></div><h2>Mis mapas</h2><div class="tarjeta"><ul class="lista">'+items+'</ul></div>'+borrar+vDatos()+'</div>';
 }
 
-function pintar(){diagrama();panel()}
-document.getElementById("diag").addEventListener("click",function(e){var g=e.target.closest(".nodo");if(!g)return;sel=g.getAttribute("data-id");pintar()});
-document.getElementById("diag").addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var g=e.target.closest(".nodo");if(!g)return;e.preventDefault();sel=g.getAttribute("data-id");pintar();var n=document.querySelector('.nodo[data-id="'+sel+'"]');if(n)n.focus()});
-document.getElementById("t-riesgos").addEventListener("click",function(){riesgos=!riesgos;this.setAttribute("aria-pressed",riesgos);diagrama()});
-try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",diagrama)}catch(e){}
-try{new MutationObserver(diagrama).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]})}catch(e){}
-lecciones();corpus();pintar();
+function actualizarSig(){var b=document.getElementById("sig");if(b&&st.actual)b.disabled=!completoPaso(st.actual,st.paso)}
+function pintar(){
+  var app=document.getElementById("app");
+  app.innerHTML=st.vista==="paso"?vPaso():st.vista==="resultado"?vResultado():st.vista==="historial"?vHistorial():st.vista==="guia"?vGuia():vInicio();
+}
+document.getElementById("app").addEventListener("input",function(e){
+  if(!st.actual)return;
+  var el=e.target;
+  if(el.id==="org")st.actual.org=el.value;
+  else if(el.id==="zona")st.actual.zona=el.value;
+  else if(el.getAttribute("data-n")){var v=el.value;st.actual.n[el.getAttribute("data-n")]=v===""?null:Math.max(0,parseInt(v,10)||0)}
+  actualizarSig();
+});
+
+document.getElementById("app").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-a]"); if(!b)return;
+  var a=b.getAttribute("data-a"); st.msg="";
+  if(a==="nuevo"){st.actual={id:"m"+Date.now(),org:"",zona:"",fecha:hoy(),m:{},n:{},r:{}};st.paso=0;st.vista="paso"}
+  else if(a==="inicio"){st.vista="inicio";st.confirmarBorrar=false}
+  else if(a==="historial"){st.vista="historial"}
+  else if(a==="guia"){st.volver=st.vista;st.vista="guia";pintar();window.scrollTo(0,0);return}
+  else if(a==="volver"){st.vista=st.volver||"inicio";pintar();window.scrollTo(0,0);return}
+  else if(a==="ver"){st.verId=b.getAttribute("data-id");st.vista="resultado"}
+  else if(a==="resp"){st.actual.r[b.getAttribute("data-q")]=+b.getAttribute("data-v")}
+  else if(a==="multi"){var q=b.getAttribute("data-q"),v=b.getAttribute("data-v"),arr=st.actual.m[q]||(st.actual.m[q]=[]),i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v)}
+  else if(a==="atras"){if(st.paso>0)st.paso--;window.scrollTo(0,0)}
+  else if(a==="sig"){
+    if(st.paso<SECS.length-1)st.paso++;
+    else{st.actual.org=st.actual.org.trim();st.actual.zona=(st.actual.zona||"").trim();st.guardados.push(st.actual);var ok=guardar();st.verId=st.actual.id;st.actual=null;st.vista="resultado";if(!ok)st.msg="Este navegador no deja guardar. El mapa se ve ahora pero se pierde al cerrar."}
+    window.scrollTo(0,0);
+  }
+  else if(a==="copiar"){
+    var txt=resumenTexto(buscar(st.verId));
+    var fin=function(m){var el=document.getElementById("msg");if(el)el.textContent=m};
+    try{navigator.clipboard.writeText(txt).then(function(){fin("Copiado. Pegalo en el grupo.")},function(){fallback(txt);fin("Seleccionado: copialo con el menú del teléfono.")})}catch(err){fallback(txt);fin("Seleccionado: copialo con el menú del teléfono.")}
+    return;
+  }
+  else if(a==="imagen"){imagen(buscar(st.verId));return}
+  else if(a==="borrar"){st.confirmarBorrar=true}
+  else if(a==="borrarNo"){st.confirmarBorrar=false}
+  else if(a==="borrarSi"){st.guardados=[];guardar();try{localStorage.removeItem(CLAVE)}catch(err){}st.confirmarBorrar=false}
+  if(a==="resp"||a==="multi"){var y=window.scrollY;pintar();window.scrollTo(0,y)}else pintar();
+});
+
+function fallback(txt){
+  var ta=document.createElement("textarea");ta.value=txt;ta.style.width="100%";ta.rows=8;ta.id="copia";
+  var m=document.getElementById("msg");if(m&&!document.getElementById("copia")){m.parentNode.insertBefore(ta,m);ta.focus();ta.select()}
+}
+function imagen(d){
+  try{
+    var svg=diagrama(d), img=new Image(), url="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+    var nombre="mapa-"+d.org.replace(/[^a-z0-9]+/gi,"-").toLowerCase()+"-"+d.fecha+".png";
+    var aviso=function(t){var m=document.getElementById("msg");if(m)m.textContent=t};
+    var bajar=function(c){var l=document.createElement("a");l.download=nombre;l.href=c.toDataURL("image/png");document.body.appendChild(l);l.click();l.remove();aviso("Si no se descargó, abrí la app instalada o en la compu.")};
+    img.onload=function(){var c=document.createElement("canvas");c.width=img.width*2;c.height=img.height*2;var x=c.getContext("2d");x.scale(2,2);x.drawImage(img,0,0);
+      c.toBlob(function(b){
+        try{
+          var f=b&&window.File?new File([b],nombre,{type:"image/png"}):null;
+          if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
+            navigator.share({files:[f],title:"Mapa de "+d.org}).then(function(){aviso("Listo.")},function(err){if(!err||err.name!=="AbortError")bajar(c)});
+          }else bajar(c);
+        }catch(err){bajar(c)}
+      },"image/png")};
+    img.src=url;
+  }catch(e){var m=document.getElementById("msg");if(m)m.textContent="No se pudo generar la imagen en esta vista."}
+}
+
+try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",pintar)}catch(e){}
+try{new MutationObserver(pintar).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]})}catch(e){}
+pintar();
 })();
 </script>
 
